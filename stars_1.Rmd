@@ -11,25 +11,46 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Presentando "stars"
 
-En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial fue revolucionado con el lanzamiento de <Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446> y la consecuente biblioteca "sf" que implementaba los conceptos introducidos. 
+En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca "sf" que implementaba los conceptos introducidos. 
 
 En una forma breve, los dados espaciales vectoriales pueden ser representados por um dataframe, en el cual se incluye una coluna de tipo "lista", que contiene la geometria del objeto a representar. Esta facilidade de tratar los objetos espaciales como dataframe, permite usar todo el potencial de manipulacion...COMPLETAR
 
+FALTA raster
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+datacubes array o arreglos con dimensiones y atributos que puedes ser de espacio o tiempo.
+Asi un archivo raster minimo tiene dos dimensiones y un atributo que es el nombre de la camada
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+abind
+GEOS
+GDAL
+PROJ4
 
-```{r cars}
-summary(cars)
+```{r, message=FALSE}
+library(stars)
 ```
 
-## Including Plots
+creando um arreglo de 4 x 4 con tres dimensiones
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+vector1 =  c (1, 2, 3,4)
+vector2 =  c (5, 6, 7, 8, 9, 10, 11, 12)
+cubo = array (c (vector1, vector2),
+              dim = c (4, 4, 3))
+cubo
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Notacion de arreglos, vemos las tres camadas llamadas aqui de 1, 2 y 3
+
+biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo estos de una dimension.
+La conversion entre raster y vector es posible usando funciones especificas (st_xy2sfc o st_sfc2xy).
+Los datos vectoriales son tratados como simple features y todas las funciones del ambiente tidyverse estan disponibles para su manipulacion.
+
+
+Un archivo raster puede ser leído de un directorio externo, usando la función "read_stars()" en donde ser requiere un único argumento de tipo texto, indicando el camino hasta él, o puede ser convertido si ya está dentro de las variables de ambiente a través de la función st_as_stars().
+
+```{r}
+cubo_stars <- st_as_stars(cubo)
+#
+cubo_stars
+```
+
