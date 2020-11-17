@@ -11,35 +11,63 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Presentando "stars"
 
-En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca "sf" que implementaba los conceptos introducidos. 
+En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca _**sf**_ que implementaba los conceptos introducidos. 
 
-En una forma breve, los dados espaciales vectoriales pueden ser representados por um dataframe, en el cual se incluye una coluna de tipo "lista", que contiene la geometria del objeto a representar. Esta facilidade de tratar los objetos espaciales como dataframe, permite usar todo el potencial de manipulacion...COMPLETAR
+En una forma breve, los dados espaciales vectoriales pueden ser representados por um dataframe, en el cual se incluye una coluna de tipo _lista_, que contiene la geometria del objeto a representar. Esta facilidade de tratar los objetos espaciales como dataframe, permite usar todo el potencial de manipulacion de los atributos (columnas) del propio dataframe.
 
 FALTA raster
 
 datacubes array o arreglos con dimensiones y atributos que puedes ser de espacio o tiempo.
-Asi un archivo raster minimo tiene dos dimensiones y un atributo que es el nombre de la camada
+Asi un archivo raster minimo tiene dos dimensiones y un atributo que es el nombre de la camada. Los objetos creados pertenecen a una nueva clase **stars** que tiene los siguientes métodos disponibles:
 
-abind
-GEOS
-GDAL
-PROJ4
+```{r}
+methods(class = "stars")
+```
 
-```{r, message=FALSE}
+
+Cuando la biblioteca _**stars**_ es cargada en el ambiente, trae consigo 2 bibliotecas auxiliares ( _abind_ e _sf_) y  se conecta  con 3 más, que son:
+
+  1. _abind_, para tratamiento de arreglos multi-dimensionales;
+  
+  2. _sf_, biblioteca para objetos georreferenciados del tipo vectorial;
+  
+  3. GEOS- _rgeos_, para manipulación de la geometria de las fecciones;
+  
+  4. GDAL- _rgadal_, para transformación de formatos vectoriales y raster;
+  
+  5. PROJ- _proj4_, interfase para transformación de sistemas de coordenadas geográficas en proyectadas.
+  
+
+```{r}
 library(stars)
 ```
 
-creando um arreglo de 4 x 4 con tres dimensiones
+### Recordando arreglos (arrays)
+Arreglos son objetos con una estrutura que permite almacenar datos multi-dimensionales. Como ejemplo, matrices o dataframes pueden contener líneas y columnas de datos y tener mas de 1 dimensión, de ahi a visualización como cubos o camadas superpuestas. Como limitación los datos contenidos en cada dimensión debem ser del mismo tipo
+
+Veamos algunos ejemplos. Creando um arreglo de 4 x 4 con tres dimensiones, a partir de dos vetores numéricos.
 
 ```{r}
-vector1 =  c (1, 2, 3,4)
-vector2 =  c (5, 6, 7, 8, 9, 10, 11, 12)
-cubo = array (c (vector1, vector2),
-              dim = c (4, 4, 3))
-cubo
+vector1 =  c (1, 2, 3,4) # primero vector con 4 números
+vector2 =  c (5, 6, 7, 8, 9, 10, 11, 12) # segundo vector con 8 números
+cubo = array (c (vector1, vector2), # creación del arreglo
+              dim = c (4, 4, 3))    # determinando el tamaño y dimensiones
+cubo                                # visualización
 ```
 
-Notacion de arreglos, vemos las tres camadas llamadas aqui de 1, 2 y 3
+Vemos en la visualización, la notacion de arreglos y tres camadas llamadas de 1, 2 y 3
+
+### Extracción de sub-conjunto de datos 
+
+Podemos extrair subconjuntos de dados, de la siguiente forma
+
+```{r}
+cubo[ , 2, 1] # todas las líneas, segunda columna, primera dimensión
+cubo[3,  , 3] # tercera línea, todas la columnas, tercera dimensión
+cubo[2, 3, 1] # segunda línea, tercera columna, primera dimensión
+cubo[2:3, 3:4, 2:3] # intervalo de columnas y líneas y dimensiones! 
+```
+
 
 biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo estos de una dimension.
 La conversion entre raster y vector es posible usando funciones especificas (st_xy2sfc o st_sfc2xy).
