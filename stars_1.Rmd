@@ -11,11 +11,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Presentando "stars"
 
-En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca _**sf**_ que implementaba los conceptos introducidos. 
+En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial em _R_ fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca _**sf**_ que implementaba los conceptos introducidos. 
 
-En una forma breve, los dados espaciales vectoriales pueden ser representados por um dataframe, en el cual se incluye una coluna de tipo _lista_, que contiene la geometria del objeto a representar. Esta facilidade de tratar los objetos espaciales como dataframe, permite usar todo el potencial de manipulacion de los atributos (columnas) del propio dataframe.
+En una forma concisa, la nueva propuesta es que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una coluna de tipo _lista_, conteniendo la geometria del objeto a representar. Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados.  
 
-FALTA raster
+Los archivos o datos de tipo raster por otro lado no estaban contemplados todavia en esta etapa, por lo que el análisis espacial em _R_ se completaba con la biblioteca _**raster**_. 
+
+Asi fué hecho por ejemplo, el curso **Introdução ao Análise Espacial** <https://github.com/HumbertoSubiza/Intro_analise_espacial_R>  (en idioma portugués), ofrecido en el Instituto Brasileiro de Geografia e Estatística, Rio de Janeiro, Brasil en 2019.
+
+Sin embargo, el concepto de tener una biblioteca única para el tratamiento de todo tipo de dato espacial continuaba a ser elaborada y así surge la biblioteca _**stars**_. .... CONTINUAR
 
 datacubes array o arreglos con dimensiones y atributos que puedes ser de espacio o tiempo.
 Asi un archivo raster minimo tiene dos dimensiones y un atributo que es el nombre de la camada. Los objetos creados pertenecen a una nueva clase **stars** que tiene los siguientes métodos disponibles:
@@ -23,7 +27,6 @@ Asi un archivo raster minimo tiene dos dimensiones y un atributo que es el nombr
 ```{r}
 methods(class = "stars")
 ```
-
 
 Cuando la biblioteca _**stars**_ es cargada en el ambiente, trae consigo 2 bibliotecas auxiliares ( _abind_ e _sf_) y  se conecta  con 3 más, que son:
 
