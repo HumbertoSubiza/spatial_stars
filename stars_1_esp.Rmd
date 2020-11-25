@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Presentando "stars"
 
+tesselation = mosaico
+
 En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial em _R_ fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca _**sf**_ que implementaba los conceptos introducidos. 
 
 De forma concisa se puede decir que la nueva propuesta, es que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una nueva coluna de tipo _lista_, que contiene la geometria del objeto a representar. Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados y extraídos sin que pierden el georreferenciamiento.   
@@ -40,7 +42,7 @@ Cuando la biblioteca _**stars**_ es cargada en el ambiente, trae consigo 2 bibli
   
   2. _sf_, biblioteca para objetos georreferenciados del tipo vectorial;
   
-  3. GEOS- _rgeos_, para manipulación de la geometria de las fecciones;
+  3. GEOS- _rgeos_, manipulación de la geometria de los elementos georreferenciados;
   
   4. GDAL- _rgadal_, para transformación de formatos vectoriales y raster;
   
@@ -72,6 +74,7 @@ Vemos en la visualización, la notacion de arreglos y tres camadas llamadas de 1
 
 ```{r}
 cubo_st <- st_as_stars(cubo) # transformación en clase stars
+cubo_st
 plot(cubo_st)                # gráfico de las 3 camadas
 ```
 
@@ -79,14 +82,15 @@ Note que en este gráfico la primera camada es denominada de 0, las siguientes 1
 
 ### Extracción de sub-conjunto de datos 
 
-Podemos extrair subconjuntos de dados, de la siguiente forma
+Podemos extrair subconjuntos de dados, con el operador "[" de la siguiente forma: el primer argumento indica el atributo, el segundo se refiere a primera dimensión, o x y el segundo a la otra dimension y. Por exemplo queremos extrair  las columnas 1 a 2 y las lineas 2 a 3 de las 3 camadas, el comando seria el siguiente:
 
 ```{r}
-#cubo_st[1 , 2, 0] # todas las líneas, segunda columna, primera dimensión
-#cubo_st[3, ,2] # tercera línea, todas la columnas, tercera dimensión
-#cubo_st[2, 3, 1] # segunda línea, tercera columna, primera dimensión
-#cubo_st[2:3, 1:3, 0:1] # intervalo de columnas y líneas y dimensiones! 
+cubo_ext <-  cubo_st[1 , 1:2, 2:3] 
+cubo_ext
+plot(cubo_ext)
 ```
+
+Veremos mas adelante otras formas mas detalladas de extrair datos, usando funciones específicas.
 
 
 biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo estos de una dimension.
@@ -112,4 +116,10 @@ cubo_stars
 ### References
 
   https://r-spatial.github.io/stars/index.html
+
+
+```{r}
+library(cubelyr)
+x %>% filter(x > 289000, x < 291000, y < 9120761, y > 9115061, band > 3) -> x7
+```
 
