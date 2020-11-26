@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Presentando "stars"
 
+tesselation = mosaico
+
 En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial em _R_ fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca _**sf**_ que implementaba los conceptos introducidos. 
 
 De forma concisa se puede decir que la nueva propuesta, es que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una nueva coluna de tipo _lista_, que contiene la geometria del objeto a representar. Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados y extraídos sin que pierden el georreferenciamiento.   

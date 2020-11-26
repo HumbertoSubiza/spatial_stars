@@ -15,7 +15,9 @@ tesselation = mosaico
 
 En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial em _R_ fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca _**sf**_ que implementaba los conceptos introducidos. 
 
-De forma concisa se puede decir que la nueva propuesta, es que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una nueva coluna de tipo _lista_, que contiene la geometria del objeto a representar. Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados y extraídos sin que pierden el georreferenciamiento.   
+De forma concisa se puede decir que la nueva propuesta, es que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una nueva coluna de tipo _lista_, que contiene la geometria del objeto a representar. 
+
+Los objetos creados son de la classe _sf_ o _simple featues_ (ver documentación de la biblioteca). Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados y extraídos sin que pierden el georreferenciamiento.   
 
 Los archivos o datos de tipo raster por otro lado no estaban todavia contemplados, por lo que el análisis espacial em _R_ se completaba con la biblioteca _**raster**_. 
 
@@ -23,103 +25,145 @@ Asi fué hecho por ejemplo, el curso **Introdução ao Análise Espacial** <http
 
 Sin embargo, el concepto de tener una biblioteca única para el tratamiento de todo tipo de dato espacial continuaba a ser elaborada y así surge la biblioteca _**stars**_. .... CONTINUAR
 
-Esta biblioteca introduce otro concepto nuevo, el de datacubes array, que podria ser traducido como arreglo cúbico de dados (una sugerencia) y donde la altura del cubo viene dada por múltiples dimensiones (o atributos).
+Esta biblioteca introduce otro concepto nuevo, el de _datacubes array_, que podria ser traducido como arreglo cúbico de dados (una sugerencia) y donde la altura del cubo viene dada por múltiples dimensiones (o atributos).
 
-Asi el menor archivo raster tiene dos dimensiones representando la localización espacial, por ejemplo y un atributo que es el tipo de dado de la camada. En la figura a seguir se representa um arreglo cúbido de cinco dimensiones.
+Asi, el menor archivo raster tiene dos dimensiones espaciales representando la localización por ejemplo y un atributo que es el tipo de dado de la capa (layer). En la figura a seguir se representa um arreglo cúbido de cinco dimensiones.
 
 ![**Cinco dimensiones: longitud, latitud, tiempo, banda y sensor**](https://raw.githubusercontent.com/r-spatial/stars/master/images/cube2.png)
 
-
-Los objetos creados por esta nueva biblioteca pertenecen a una nueva clase, denominada **stars** y que al dia de hoy tiene los siguientes métodos disponibles:
-
-```{r}
-methods(class = "stars")
-```
+---
 
 Cuando la biblioteca _**stars**_ es cargada en el ambiente, trae consigo 2 bibliotecas auxiliares ( _abind_ e _sf_) y se conecta  con 3 más, que son:
 
-  1. _abind_, para tratamiento de arreglos multi-dimensionales;
+  1. abind, para tratamiento de arreglos multi-dimensionales;
   
-  2. _sf_, biblioteca para objetos georreferenciados del tipo vectorial;
+  2. sf, biblioteca para objetos georreferenciados del tipo vectorial;
   
   3. GEOS- _rgeos_, manipulación de la geometria de los elementos georreferenciados;
   
   4. GDAL- _rgadal_, para transformación de formatos vectoriales y raster;
   
-  5. PROJ- _proj4_, interfase para transformación de sistemas de coordenadas geográficas en proyectadas.
-  
+  5. PROJ- _proj4_, interfase para transformación de sistemas de coordenadas geográficas en sistema de coordenadas proyectadas.
+
 
 ```{r}
 library(stars)
 ```
+
+---
+
+Los objetos creados por esta nueva biblioteca pertenecen a una nueva clase, denominada **stars** y que al dia de hoy tiene los siguientes métodos disponibles:  
+
+```{r}
+methods(class = "stars")
+```
+
 
 ### Recordando arreglos (arrays)
 Antes de continuar, es útil recordar el concepto y manejo de arreglos en _R_.
 
 **Arreglos son objetos con una estrutura que permite almacenar datos multi-dimensionales.** 
 
-Como ejemplo, matrices o dataframes pueden contener líneas y columnas de datos y tener mas de 1 dimensión, de ahi a visualización como cubos o camadas superpuestas. Como limitación los datos contenidos en cada dimensión debem ser del mismo tipo
+Como ejemplo, matrices y dataframes pueden contener líneas y columnas de datos, la diferencia con arreglos es que éste puede tener mas de 1 dimensión, de ahi a visualización como cubos o capas superpuestas. Como limitación los datos contenidos en cada dimensión debem ser del mismo tipo
 
-Veamos algunos ejemplos. Creamos um arreglo de 4 x 4 con tres dimensiones, a partir de dos vetores numéricos.
+Veamos algunos ejemplos. Creamos um arreglo de 4 x 4 con tres dimensiones, a partir de dos vectores numéricos.
 
 ```{r}
 vector1 =  c (1, 2, 3,4) # primero vector con 4 números
 vector2 =  c (5, 6, 7, 8, 9, 10, 11, 12) # segundo vector con 8 números
-cubo = array (c (vector1, vector2), # creación del arreglo
-              dim = c (4, 4, 3))    # determinando el tamaño y dimensiones
+col.nomes <- c("col1","col2","col3","col4")
+lin.nomes <- c("lin1","lin2","lin3","lin4")
+matriz.nomes <- c("M1","M2","M3")
+cubo = array (c(vector1, vector2), # creación del arreglo
+              dim = c (4, 4, 3),# determinando el tamaño y dimensiones
+              dimnames = list(lin.nomes, col.nomes, matriz.nomes))
+
 cubo                                # visualización
 ```
 
-Vemos en la visualización, la notacion de arreglos y tres camadas llamadas de 1, 2 y 3. El objeto creado es solamente de la clase _array_. Transformamos el mismo en objeto de la clase _stars_ e visualizamos dos simples pasos, como sigue.
+Vemos en la visualización, la notacion de arreglos y tres capas llamadas de M1, M2 y M3. El objeto creado es solamente de la clase _array_. La extracción de dados usando el operador "[", es simple. siguiendo el orden linea, columna, dimensión.
 
 ```{r}
-cubo_st <- st_as_stars(cubo) # transformación en clase stars
-cubo_st
-plot(cubo_st)                # gráfico de las 3 camadas
+(M2 <- cubo[ , ,2]) # segunda capa o dimensión
+(M3_sub <- cubo[1:2, 2:4, 3])
+               # lineas 1 y 2, columnas 2 a 4 de la tercera dimensión
 ```
 
-Note que en este gráfico la primera camada es denominada de 0, las siguientes 1 y 2. El primer elemento de la primera camada (número 1), está localizado en el extremo inferior izquierdo y así sigue el orden de izquierda a derecha y de abajo para arriba, en el sentido de las lineas y columnas. Más adelante veremos con detalle como se representan los dados gráficamente cuando están georreferenciados.
+Veremos mas adelante otras formas de extrair datos, usando funciones específicas de la biblioteca, que poseem pequeñas diferencias con las presentadas.
 
-### Extracción de sub-conjunto de datos 
+---
 
-Podemos extrair subconjuntos de dados, con el operador "[" de la siguiente forma: el primer argumento indica el atributo, el segundo se refiere a primera dimensión, o x y el segundo a la otra dimension y. Por exemplo queremos extrair  las columnas 1 a 2 y las lineas 2 a 3 de las 3 camadas, el comando seria el siguiente:
+La biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo éstos de una dimension espacial.
 
-```{r}
-cubo_ext <-  cubo_st[1 , 1:2, 2:3] 
-cubo_ext
-plot(cubo_ext)
-```
-
-Veremos mas adelante otras formas mas detalladas de extrair datos, usando funciones específicas.
-
-
-biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo estos de una dimension.
 La conversion entre raster y vector es posible usando funciones especificas (st_xy2sfc o st_sfc2xy).
-Los datos vectoriales son tratados como simple features y todas las funciones del ambiente tidyverse estan disponibles para su manipulacion.
-
-
-Un archivo raster puede ser leído de un directorio externo, usando la función "read_stars()" en donde ser requiere un único argumento de tipo texto, indicando el camino hasta él, o puede ser convertido si ya está dentro de las variables de ambiente a través de la función st_as_stars().
-
-```{r}
-cubo_stars <- st_as_stars(cubo)
-#
-cubo_stars
-```
-
-
-
-![Cinco dimensiones: long, lat, banda, tiempo, sensor](https://raw.githubusercontent.com/r-spatial/stars/master/images/cube2.png)
-
+Los datos vectoriales son tratados como _simple features_ y todas las funciones del ambiente tidyverse están disponibles para su manipulacion.
 
 ![Datos vectoriales em stars](https://raw.githubusercontent.com/r-spatial/stars/master/images/cube3.png)
+
+### Lectura de datos
+
+Un archivo raster puede ser leído de un directorio externo al ambiente usando la función "read_stars()", en donde ser requiere un único argumento de tipo texto, indicando el camino hasta él, o puede ser convertido al formato _**stars**_, si ya está dentro de las variables de ambiente a través de la función _st_as_stars()_.
+Para simplificar vamos leer um archivo raster de ejemplo, que la propia biblioteca incluye. El archivo es uma imagem Landsat 7 ETM, com 6 bandas, azul, verde, rojo y 3 de infrarrojo em formato Geotiff. La importación hará uso de la biblioteca GDAL
+
+```{r}
+tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
+
+img = read_stars(tif) # leitura del archivo
+
+plot(img, axes = T)
+```
+
+---
+
+### Explorando el objeto
+
+```{r}
+img
+```
+
+Vemos que el objeto creado tiene 3 dimensiones, siendo éstas x, y e band y 1 atributo que son los valores de cada banda. A continuación presenta las estadísticas de los valores de la totalidad del archivo.
+
+Por último muestra los componentes de cada dimensión, siendo:
+
+
+|campo   |	significado         |
+|:--------|:----------------------|
+|from    | origen del indice (i = 1)    |
+|to	     |indice final (dim(x)[i])|
+|offset  |valor inicial del pixel (si objeto regular)|
+|delta	 |tamaño del intervalo de pixel o célula, (si objeto regular)|
+|refsys	 |sistema geodésico de referencia en formato proj4|
+|point	 |valor lógico; las células son puntos (T) o intervalos (F)|
+|values	 |secuencia de valores (ex. geometries),se irregular|
+
+La referencia espacial para los indices está dada por la esquina superior izquierda de cada célula o pixel, si deseamos valores al centro de la célula precisamos agregar la mitad del intervalo (delta) al primero valor a calcular.
+
+En el caso específico de la imagen importada los valores de x son un total de 349 y de y 352, comenzando por los valores de 288776 para el eje x y de 9120761. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula de 28,5 m y -28,5 m respectivamente. La imagen corresponde a um raster (point = F) del área de Recife, Brasil.
 
 ### References
 
   https://r-spatial.github.io/stars/index.html
 
+Leitura de archivo vectorial tipo ESRI por la biblioteca **sf**.
 
 ```{r}
-library(cubelyr)
-x %>% filter(x > 289000, x < 291000, y < 9120761, y > 9115061, band > 3) -> x7
+library(sf)
+olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/olinda.shp")
+plot(olinda["gid"])
 ```
+
+transformacion en clase stars
+
+```{r}
+olinda_st <- st_as_stars(olinda)
+olinda_st
+plot(olinda_st["gid"], axes = T)
+```
+
+
+```{r}
+#library(cubelyr)
+#x %>% filter(x > 289000, x < 291000, y < 9120761, y > 9115061, band > 3) -> x7
+```
+
 
