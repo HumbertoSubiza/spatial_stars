@@ -17,7 +17,7 @@ En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vecto
 
 De forma concisa se puede decir que la nueva propuesta, era que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una nueva coluna de tipo _lista_, que contiene la geometria del objeto a representar. 
 
-Los objetos creados son de la classe _sf_ o _simple features_ (ver documentación de la biblioteca _**sf**_). Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados y extraídos sin perder el georreferenciamiento en el proceso.   
+Los objetos creados son de la classe _sf_ o _simple features_ (ver documentación de la biblioteca _**sf**_). Al tratar los objetos espaciales como dataframe, sus columnas o atributos, son facilmente manipulados y extraídos sin perder el georreferenciamiento en el proceso.   
 
 Los archivos o datos de tipo raster por otro lado no estaban todavia contemplados, por lo que el análisis espacial em _R_ se completaba con la biblioteca _**raster**_. 
 
@@ -94,7 +94,7 @@ Veremos mas adelante otras formas de extrair datos, usando funciones específica
 
 ---
 
-La biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo éstos de una dimension espacial.
+La biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo éstos bi-dimensioales.
 
 La conversion entre raster y vector es posible usando funciones especificas que veremos mas adelante.
 
@@ -106,9 +106,9 @@ Los datos vectoriales son tratados como _simple features_ y todas las funciones 
 
 Un archivo raster puede ser leído de un directorio externo al ambiente usando la función _read_stars()_, en donde ser requiere un único argumento del tipo texto, indicando el camino hasta él, o puede ser convertido al formato _**stars**_, si ya está dentro de las variables de ambiente a través de la función _st_as_stars()_.
  
-La biblioteca permite trabajar con dados en mallas regular o irregulamente espaciadas, así como con proyecciones geográficas o curvilíneas.
+La biblioteca permite trabajar con dados en mallas regular o irregulamente espaciadas, así como con proyecciones cartesians o curvilíneas.
 
-Para simplificar vamos leer um archivo raster de ejemplo, que la propia biblioteca incluye. El archivo es uma imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo y 3 más de infrarrojo, em formato Geotiff. La importación hará uso de la biblioteca GDAL
+Para simplificar vamos leer um archivo raster de ejemplo que la propia biblioteca incluye. El archivo es uma imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo, em formato Geotiff. La importación hará uso de la biblioteca GDAL.
 
 ```{r}
 tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
@@ -122,11 +122,13 @@ plot(img, axes = T)
 
 ### 3. Explorando el objeto
 
+Veamos las características del objeto creado.
+
 ```{r}
 img
 ```
 
-Vemos que el objeto creado tiene 3 dimensiones, siendo éstas _x_, _y_ e _band_ y 1 atributo que son los valores de cada banda. A continuación presenta las estadísticas de los valores del atributo para la totalidad del archivo.
+Vemos que el objeto creado es de la clase **stars** y tiene 3 dimensiones, ( _x_, _y_ e _band_) y 1 atributo que son los valores de cada banda. A continuación presenta las estadísticas de los valores del atributo para la totalidad del archivo.
 
 Por último muestra los componentes de cada dimensión, siendo:
 
@@ -141,29 +143,36 @@ Por último muestra los componentes de cada dimensión, siendo:
 |point	 |valor lógico; las células son puntos (T) o intervalos (F)|
 |values	 |secuencia de valores (ex. geometries),se irregular|
 
-En el caso específico de la imagen importada los valores de _x_ son un total de 349 y de _y_ 352, comenzando por los valores de 288776 para el eje _x_ y de 9120761 para _y_. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula de 28,5 m y -28,5 m respectivamente. La imagen corresponde a um raster (point = F) del área de Recife, Brasil.
+En el caso específico de la imagen importada la cantidade de células en _x_ es de 349 y en _y_ de 352, comenzando con los valores de 288776 para el eje _x_ y de 9120761 para _y_. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula (delta) de 28,5 m y -28,5 m respectivamente. La imagen corresponde a um raster (point = F) del área de Recife, Brasil.
 
 La referencia espacial para los indices está dada por la esquina superior izquierda de cada célula o pixel, siendo la primera célula la que está localizada en la esquina superior izquierda. El índice se cuenta de izquierda a derecha y de la parte superior a la inferior, si deseamos valores al centro de la célula precisamos agregar la mitad del intervalo o delta al valor a calcular.
 
 La fórmula para el cálculo del valor de cada célula seria $$v = offset + (i−1) × delta$$. De esta forma el valor para la célula *v(15, 20)* seria: $$v_{x_{15}} = 288776 + (15-1)~ X~ 28.5 = 289175$$ y $$v_{y_{20}} = 9120761 + (20-1)~ X~ -28.5 = 9120220$$.
 
-Para valores al centro de la célula, el delta debe ser aumentado em $14.3$.
+Para valores al centro de la célula, el valor absoluto del delta debe ser aumentado em $14.3$.
+
+Si se quiere extrair um subconjunto de datos de una área específica, podemos usar la notación de arreglos con cuatro valores de la seguiente forma: el primer argumento en el paréntesis recto es el atributo escogido, en este caso tenemos solamente un atributo. El segundo valor se refiere a la segunda dimensión, que es _x_, el tercer valor valor se refiere a la tercera dimensión _y_ y por último, el cuarto valor se refiere a la capa o capas a extrair. Asi para extrair los valores de _x_ del 1 al 10 e _y_ del 20 al 30 de las bandas 3 y 4, colocamos el siguiente paréntesis [1, 1:10, 20:30, 3:4]. En la práctica:  
 
 
-### References
+```{r}
+dim(img[[1]]) # dimensiones del objeto
 
-  https://r-spatial.github.io/stars/index.html
+plot(img[1, 1:10, 20:30, 3:4], axes = T) # Extracción y visualización
 
-Leitura de archivo vectorial tipo ESRI por la biblioteca **sf**.
+```
+
+
+### 4. Leitura de archivo vectorial tipo ESRI por la biblioteca **sf**.
+
 
 ```{r}
 library(sf)
-olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp")
-olinda
-plot(olinda["gid"], axes = T)
+olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp") # lectura
+olinda         # características del objeto importado
+plot(olinda["gid"], axes = T) # visualización
 ```
 
-Transformación del objeto en clase **stars**.
+Transformación del objeto en clase **stars**, características y visualización.
 
 ```{r}
 olinda_st <- st_as_stars(olinda)
@@ -171,12 +180,14 @@ olinda_st
 plot(olinda_st["gid"], axes = T)
 ```
 
-
-
-
 ```{r}
-#library(cubelyr)
-#x %>% filter(x > 289000, x < 291000, y < 9120761, y > 9115061, band > 3) -> x7
+plot(olinda_st[3])
 ```
 
 
+
+
+
+### References
+
+  https://r-spatial.github.io/stars/index.html
