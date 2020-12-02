@@ -15,9 +15,9 @@ tesselation = mosaico
 
 En 2018, el tratamiento y manipulación de dados georreferenciados de tipo vectorial em _R_ fue revolucionado con el lanzamiento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** y la consecuente biblioteca _**sf**_ que implementaba los conceptos introducidos. 
 
-De forma concisa se puede decir que la nueva propuesta, es que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una nueva coluna de tipo _lista_, que contiene la geometria del objeto a representar. 
+De forma concisa se puede decir que la nueva propuesta, era que los dados espaciales vectoriales pueden ser representados por un dataframe, en el cual se incluye una nueva coluna de tipo _lista_, que contiene la geometria del objeto a representar. 
 
-Los objetos creados son de la classe _sf_ o _simple featues_ (ver documentación de la biblioteca). Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados y extraídos sin que pierden el georreferenciamiento.   
+Los objetos creados son de la classe _sf_ o _simple features_ (ver documentación de la biblioteca _**sf**_). Al tratar los objetos espaciales como dataframe, se permite que sus columnas o atributos, sean facilmente manipulados y extraídos sin perder el georreferenciamiento en el proceso.   
 
 Los archivos o datos de tipo raster por otro lado no estaban todavia contemplados, por lo que el análisis espacial em _R_ se completaba con la biblioteca _**raster**_. 
 
@@ -33,7 +33,7 @@ Asi, el menor archivo raster tiene dos dimensiones espaciales representando la l
 
 ---
 
-Cuando la biblioteca _**stars**_ es cargada en el ambiente, trae consigo 2 bibliotecas auxiliares ( _abind_ e _sf_) y se conecta  con 3 más, que son:
+Cuando la biblioteca _**stars**_ es cargada en el ambiente _R_, trae consigo 2 bibliotecas auxiliares ( _abind_ e _sf_) y se conecta  con 3 más, que son:
 
   1. abind, para tratamiento de arreglos multi-dimensionales;
   
@@ -59,7 +59,8 @@ methods(class = "stars")
 ```
 
 
-### Recordando arreglos (arrays)
+### 2. Recordando arreglos (arrays)
+
 Antes de continuar, es útil recordar el concepto y manejo de arreglos en _R_.
 
 **Arreglos son objetos con una estrutura que permite almacenar datos multi-dimensionales.** 
@@ -71,12 +72,12 @@ Veamos algunos ejemplos. Creamos um arreglo de 4 x 4 con tres dimensiones, a par
 ```{r}
 vector1 =  c (1, 2, 3,4) # primero vector con 4 números
 vector2 =  c (5, 6, 7, 8, 9, 10, 11, 12) # segundo vector con 8 números
-col.nomes <- c("col1","col2","col3","col4")
-lin.nomes <- c("lin1","lin2","lin3","lin4")
-matriz.nomes <- c("M1","M2","M3")
+col.nombres <- c("col1","col2","col3","col4")
+lin.nombres <- c("lin1","lin2","lin3","lin4")
+matriz.nombres <- c("M1","M2","M3")
 cubo = array (c(vector1, vector2), # creación del arreglo
               dim = c (4, 4, 3),# determinando el tamaño y dimensiones
-              dimnames = list(lin.nomes, col.nomes, matriz.nomes))
+              dimnames = list(lin.nombres, col.nombres, matriz.nombres))
 
 cubo                                # visualización
 ```
@@ -85,8 +86,8 @@ Vemos en la visualización, la notacion de arreglos y tres capas llamadas de M1,
 
 ```{r}
 (M2 <- cubo[ , ,2]) # segunda capa o dimensión
-(M3_sub <- cubo[1:2, 2:4, 3])
-               # lineas 1 y 2, columnas 2 a 4 de la tercera dimensión
+(M3_sub <- cubo[1:2, 2:4, 3]) # lineas 1 y 2, columnas 2 a 4 de la tercera dimensión
+               
 ```
 
 Veremos mas adelante otras formas de extrair datos, usando funciones específicas de la biblioteca, que poseem pequeñas diferencias con las presentadas.
@@ -95,15 +96,19 @@ Veremos mas adelante otras formas de extrair datos, usando funciones específica
 
 La biblioteca maneja tambien datos vectoriales, del tipo punto o poligono, siendo éstos de una dimension espacial.
 
-La conversion entre raster y vector es posible usando funciones especificas (st_xy2sfc o st_sfc2xy).
+La conversion entre raster y vector es posible usando funciones especificas que veremos mas adelante.
+
 Los datos vectoriales son tratados como _simple features_ y todas las funciones del ambiente tidyverse están disponibles para su manipulacion.
 
 ![Datos vectoriales em stars](https://raw.githubusercontent.com/r-spatial/stars/master/images/cube3.png)
 
 ### Lectura de datos
 
-Un archivo raster puede ser leído de un directorio externo al ambiente usando la función "read_stars()", en donde ser requiere un único argumento de tipo texto, indicando el camino hasta él, o puede ser convertido al formato _**stars**_, si ya está dentro de las variables de ambiente a través de la función _st_as_stars()_.
-Para simplificar vamos leer um archivo raster de ejemplo, que la propia biblioteca incluye. El archivo es uma imagem Landsat 7 ETM, com 6 bandas, azul, verde, rojo y 3 de infrarrojo em formato Geotiff. La importación hará uso de la biblioteca GDAL
+Un archivo raster puede ser leído de un directorio externo al ambiente usando la función _read_stars()_, en donde ser requiere un único argumento del tipo texto, indicando el camino hasta él, o puede ser convertido al formato _**stars**_, si ya está dentro de las variables de ambiente a través de la función _st_as_stars()_.
+ 
+La biblioteca permite trabajar con dados en mallas regular o irregulamente espaciadas, así como con proyecciones geográficas o curvilíneas.
+
+Para simplificar vamos leer um archivo raster de ejemplo, que la propia biblioteca incluye. El archivo es uma imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo y 3 más de infrarrojo, em formato Geotiff. La importación hará uso de la biblioteca GDAL
 
 ```{r}
 tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
@@ -115,20 +120,20 @@ plot(img, axes = T)
 
 ---
 
-### Explorando el objeto
+### 3. Explorando el objeto
 
 ```{r}
 img
 ```
 
-Vemos que el objeto creado tiene 3 dimensiones, siendo éstas x, y e band y 1 atributo que son los valores de cada banda. A continuación presenta las estadísticas de los valores de la totalidad del archivo.
+Vemos que el objeto creado tiene 3 dimensiones, siendo éstas _x_, _y_ e _band_ y 1 atributo que son los valores de cada banda. A continuación presenta las estadísticas de los valores del atributo para la totalidad del archivo.
 
 Por último muestra los componentes de cada dimensión, siendo:
 
 
 |campo   |	significado         |
 |:--------|:----------------------|
-|from    | origen del indice (i = 1)    |
+|from    | origen del indice (i = 1)  |
 |to	     |indice final (dim(x)[i])|
 |offset  |valor inicial del pixel (si objeto regular)|
 |delta	 |tamaño del intervalo de pixel o célula, (si objeto regular)|
@@ -136,9 +141,14 @@ Por último muestra los componentes de cada dimensión, siendo:
 |point	 |valor lógico; las células son puntos (T) o intervalos (F)|
 |values	 |secuencia de valores (ex. geometries),se irregular|
 
-La referencia espacial para los indices está dada por la esquina superior izquierda de cada célula o pixel, si deseamos valores al centro de la célula precisamos agregar la mitad del intervalo (delta) al primero valor a calcular.
+En el caso específico de la imagen importada los valores de _x_ son un total de 349 y de _y_ 352, comenzando por los valores de 288776 para el eje _x_ y de 9120761 para _y_. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula de 28,5 m y -28,5 m respectivamente. La imagen corresponde a um raster (point = F) del área de Recife, Brasil.
 
-En el caso específico de la imagen importada los valores de x son un total de 349 y de y 352, comenzando por los valores de 288776 para el eje x y de 9120761. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula de 28,5 m y -28,5 m respectivamente. La imagen corresponde a um raster (point = F) del área de Recife, Brasil.
+La referencia espacial para los indices está dada por la esquina superior izquierda de cada célula o pixel, siendo la primera célula la que está localizada en la esquina superior izquierda. El índice se cuenta de izquierda a derecha y de la parte superior a la inferior, si deseamos valores al centro de la célula precisamos agregar la mitad del intervalo o delta al valor a calcular.
+
+La fórmula para el cálculo del valor de cada célula seria $$v = offset + (i−1) × delta$$. De esta forma el valor para la célula *v(15, 20)* seria: $$v_{x_{15}} = 288776 + (15-1)~ X~ 28.5 = 289175$$ y $$v_{y_{20}} = 9120761 + (20-1)~ X~ -28.5 = 9120220$$.
+
+Para valores al centro de la célula, el delta debe ser aumentado em $14.3$.
+
 
 ### References
 
@@ -148,17 +158,20 @@ Leitura de archivo vectorial tipo ESRI por la biblioteca **sf**.
 
 ```{r}
 library(sf)
-olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/olinda.shp")
-plot(olinda["gid"])
+olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp")
+olinda
+plot(olinda["gid"], axes = T)
 ```
 
-transformacion en clase stars
+Transformación del objeto en clase **stars**.
 
 ```{r}
 olinda_st <- st_as_stars(olinda)
 olinda_st
 plot(olinda_st["gid"], axes = T)
 ```
+
+
 
 
 ```{r}
