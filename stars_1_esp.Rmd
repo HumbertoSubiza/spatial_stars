@@ -33,6 +33,8 @@ Asi, el menor archivo raster tiene dos dimensiones espaciales representando la l
 
 ---
 
+En el caso de archivos de tipo vectorial, éstos tienen 1 dimensión, dada por una lista con la geometria del objeto y pueden tener varios atributos.
+
 Cuando la biblioteca _**stars**_ es cargada en el ambiente _R_, trae consigo 2 bibliotecas auxiliares ( _abind_ e _sf_) y se conecta  con 3 más, que son:
 
   1. abind, para tratamiento de arreglos multi-dimensionales;
@@ -65,7 +67,7 @@ Antes de continuar, es útil recordar el concepto y manejo de arreglos en _R_.
 
 **Arreglos son objetos con una estrutura que permite almacenar datos multi-dimensionales.** 
 
-Como ejemplo, matrices y dataframes pueden contener líneas y columnas de datos, la diferencia con arreglos es que éste puede tener mas de 1 dimensión, de ahi a visualización como cubos o capas superpuestas. Como limitación los datos contenidos en cada dimensión debem ser del mismo tipo
+Como ejemplo, matrices y dataframes pueden contener líneas y columnas de datos, la diferencia con arreglos es que éste puede tener mas de 1 dimensión, de ahi la visualización como cubos o capas superpuestas. Como limitación los datos contenidos en cada dimensión debem ser del mismo tipo
 
 Veamos algunos ejemplos. Creamos um arreglo de 4 x 4 con tres dimensiones, a partir de dos vectores numéricos.
 
@@ -106,9 +108,9 @@ Los datos vectoriales son tratados como _simple features_ y todas las funciones 
 
 Un archivo raster puede ser leído de un directorio externo al ambiente usando la función _read_stars()_, en donde ser requiere un único argumento del tipo texto, indicando el camino hasta él, o puede ser convertido al formato _**stars**_, si ya está dentro de las variables de ambiente a través de la función _st_as_stars()_.
  
-La biblioteca permite trabajar con dados en mallas regular o irregulamente espaciadas, así como con proyecciones cartesians o curvilíneas.
+La biblioteca permite trabajar con dados en mallas regular o irregulamente espaciadas, así como con proyecciones cartesianas o curvilíneas. Durante la lectura e importación del archivo (o parte de él), los valores de las bandas importadas muchas vezes UINT8 o UINT16, son convertidos a valores numéricos de doble precisión y si necesario, reconvertidos. Todos los datos importados en la lectura se almacenan en una única estrutura de arreglo **stars**.
 
-Para simplificar vamos leer um archivo raster de ejemplo que la propia biblioteca incluye. El archivo es uma imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo, em formato Geotiff. La importación hará uso de la biblioteca GDAL.
+Para simplificar vamos leer um archivo raster de ejemplo que la propia biblioteca **stars** incluye. El archivo es uma imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo, em formato Geotiff. La importación hará uso de la biblioteca GDAL.
 
 ```{r}
 tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
@@ -143,13 +145,15 @@ Por último muestra los componentes de cada dimensión, siendo:
 |point	 |valor lógico; las células son puntos (T) o intervalos (F)|
 |values	 |secuencia de valores (ex. geometries),se irregular|
 
-En el caso específico de la imagen importada la cantidade de células en _x_ es de 349 y en _y_ de 352, comenzando con los valores de 288776 para el eje _x_ y de 9120761 para _y_. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula (delta) de 28,5 m y -28,5 m respectivamente. La imagen corresponde a um raster (point = F) del área de Recife, Brasil.
+En el caso específico de la imagen importada la cantidade de células en  la dimension _x_ es de 349 y en la dimensión _y_ de 352, comenzando con los valores de 288776 para el eje _x_ y de 9120761 para _y_. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula (delta) de 28,5 m y -28,5 m respectivamente. La imagen corresponde a um raster (point = F) del área de Recife, Brasil.
 
-La referencia espacial para los indices está dada por la esquina superior izquierda de cada célula o pixel, siendo la primera célula la que está localizada en la esquina superior izquierda. El índice se cuenta de izquierda a derecha y de la parte superior a la inferior, si deseamos valores al centro de la célula precisamos agregar la mitad del intervalo o delta al valor a calcular.
+La referencia espacial para los indices está dada por la esquina superior izquierda de cada célula o pixel, siendo la primera célula aquella localizada en la esquina superior izquierda del mosaico. El índice se cuenta de izquierda a derecha y de la parte superior a la inferior, si deseamos valores al centro de la célula precisamos agregar la mitad del intervalo o delta al valor a calcular.
 
-La fórmula para el cálculo del valor de cada célula seria $$v = offset + (i−1) × delta$$. De esta forma el valor para la célula *v(15, 20)* seria: $$v_{x_{15}} = 288776 + (15-1)~ X~ 28.5 = 289175$$ y $$v_{y_{20}} = 9120761 + (20-1)~ X~ -28.5 = 9120220$$.
+La fórmula para el cálculo del valor de cada célula en una determinada dimensión (espacial o temporal) seria $$v = offset + (i−1) × delta$$. 
 
-Para valores al centro de la célula, el valor absoluto del delta debe ser aumentado em $14.3$.
+De esta forma el valor para la célula *v(15, 20)*, en las dimensiones _x_ e _y_ seria: $$v_{x_{15}} = 288776 + (15-1)~ X~ 28.5 = 289175$$ y $$v_{y_{20}} = 9120761 + (20-1)~ X~ -28.5 = 9120220$$.
+
+Para valores referidos al centro de la célula, el valor absoluto del delta debe ser aumentado em $14.3$.
 
 Si se quiere extrair um subconjunto de datos de una área específica, podemos usar la notación de arreglos con cuatro valores de la seguiente forma: el primer argumento en el paréntesis recto es el atributo escogido, en este caso tenemos solamente un atributo. El segundo valor se refiere a la segunda dimensión, que es _x_, el tercer valor valor se refiere a la tercera dimensión _y_ y por último, el cuarto valor se refiere a la capa o capas a extrair. Asi para extrair los valores de _x_ del 1 al 10 e _y_ del 20 al 30 de las bandas 3 y 4, colocamos el siguiente paréntesis [1, 1:10, 20:30, 3:4]. En la práctica:  
 
@@ -161,33 +165,71 @@ plot(img[1, 1:10, 20:30, 3:4], axes = T) # Extracción y visualización
 
 ```
 
+---
 
 ### 4. Leitura de archivo vectorial tipo ESRI por la biblioteca **sf**.
 
+Los objetos del tipo vectorial pueden importarse a través de la biblioteca **sf** o pueden crearse usando funciones de la propia biblioteca **stars**. Primero vamos importar un archivo de la misma área de la imagen anterior, que representa los límites del município de Olinda, Brasil.
 
 ```{r}
 library(sf)
 olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp") # lectura
+class(olinda)  # clase 
 olinda         # características del objeto importado
-plot(olinda["gid"], axes = T) # visualización
+plot(olinda["gid"], axes = T) # visualización como objeto sf
 ```
+
+---
+
+El objeto importado es del tipo polígono con 5 atributos, en projección UTM zona 25S del sistema de referencia geodésico WGS84. La clase es, entre otras, **sf** y **dataframe**. Los atributos son presentados como una tabla con los valores de cada atributo y la columna final con la geometria del objeto.
 
 Transformación del objeto en clase **stars**, características y visualización.
 
+---
+
 ```{r}
 olinda_st <- st_as_stars(olinda)
+class(olinda_st)
 olinda_st
 plot(olinda_st["gid"], axes = T)
 ```
 
+---
+
+El objeto es del tipo **stars**, con apenas 1 dimensión y 5 atributos, siendo éstos presentados en resumen estatístico, dependiendo del tipo de atributo. La visualización es semejante a la anterior, pudiendo colocar en el comando _plot()_, el nombre o el número del atributo deseado.
+
+
 ```{r}
-plot(olinda_st[3])
+plot(olinda_st[4:5])
 ```
 
+---
+
+### 5. Grabación de objetos **stars**
+
+Para finalizar esta presentación, la función _write_stars()_ permite grabar objetos al disco duro, usando la biblioteca **GDAL**. El siguiente fragmento de código extrae y graba con el nombre de "stars1.tif", las líneas 1 a 10, las columnas 20 a 30 de las bandas 4 a 6 de la imagem ETM, correspondientea a las bandas de azul, verde y rojo. A continuación lee nuevamente el archivo grabado y lo visualiza en un gráfico
+
+ 
+```{r}
+write_stars(adrop(img[1, 1:10, 20:30, 1:3]), "stars1.tif")
+tif <- c("stars1.tif")
+stars1 <- read_stars(tif)
+plot(stars1, axes = T)
+```
+
+---
+
+### Referencias
 
 
+stars: Spatiotemporal Arrays, Raster and Vector Data Cubes en:  
+
+  <https://r-spatial.github.io/stars/index.html>
+  
+  <https://github.com/r-spatial/stars/>
+
+---
 
 
-### References
-
-  https://r-spatial.github.io/stars/index.html
+  
+Pebesma, E., 2018. Simple Features for R: Standardized Support for Spatial Vector Data. The R Journal 10 (1), 439-446, https://doi.org/10.32614/RJ-2018-009 <https://r-spatial.github.io/sf/>
