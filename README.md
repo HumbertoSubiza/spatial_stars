@@ -7,7 +7,7 @@ Repositorio para estudio y difusión de la biblioteca R "stars"
 
 Documentos relativos a la biblioteca pueden ser consultados em <https://r-spatial.github.io/stars/articles/>
 
-Primer documento con la presentación de la biblioteca **stars_1_esp** y **stars_1_prt**,  en idioma español y portugués fueron terminados en diciembre 2020.
+Primer documento con la presentación de la biblioteca **stars_1_esp.rmd** y **stars_1_prt.rmd**,  en idioma español y portugués fueron terminados en 4 de diciembre 2020.
 
 Segundo documento en elaboración.
 
