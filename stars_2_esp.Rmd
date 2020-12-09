@@ -11,30 +11,40 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Manipulación de objetos stars raster y vectoriales
 
-Comenzamos cargando nuevamente la imagen de exemplo que la propia biblioteca **stars** trae.
+Comenzamos cargando nuevamente la imagen de exemplo de la biblioteca **stars**. El archivo es una imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo, en formato Geotiff.
 
-```{r}
+```{r 2_1}
 library(stars)
 ```
 
 ### Leyendo  el raster
 
-```{r}
+---
+
+```{r 2_2}
 tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
 
 img = read_stars(tif) # lectura del archivo
 
-plot(img, axes = T)
+plot(img, axes = T) # visualizer las 6 bandas
 ```
 
+---
+
 Es un objeto de 3 dimensiones, _x_, _y_, _band_ en formato de lista;
-Inspeccionando o objeto _img_ en la ventana de ambiente, vemos que tenemos un vector numérico con el tamaño de cada dimensión [1:349, 1:352, 1:6] y los valores a continuacion. 
+Inspeccionando o objeto _img_ en la ventana de ambiente de _RStudio_, vemos un vector numérico con el tamaño de cada dimensión [1:349, 1:352, 1:6] y los valores a continuación. 
+
+---
 
 ### Conversión de dimensión en atributos y atributos en dimensión
 
-El objeto leído tiene en su tercera dimensión _band_ una lista con las bandas 1 a 6. Es posible pasar las bandas para atributos y eliminar la dimensión correspondiente. De esta forma el nuevo objeto que crearemos tendrá solamente las dimensiones espaciales de _x_ e _y_ y 6 nuevos atributos.
+El objeto leído tiene en su tercera dimensión _band_ una lista con las bandas 1 a 6. Es posible pasar las bandas para atributos y eliminar la dimensión correspondiente. 
 
-```{r}
+De esta forma el nuevo objeto que crearemos tendrá solamente las dimensiones espaciales de _x_ e _y_ y 6 nuevos atributos. La función que será usada es _split()_, que divide los datos indicados en el primer argumento, de acuerdo a grupos definidos por el segundo argumento colocado. 
+
+---
+
+```{r 2_3}
 # separación de la imagen por la dimensión bandas
 (img.sep = split(img, "band"))
 
@@ -42,14 +52,19 @@ El objeto leído tiene en su tercera dimensión _band_ una lista con las bandas 
 plot(img.sep["X4"], axes = T)
 ```
 
-El objeto "Large stars" con 2 dimensiones y 6 atributos de X1:X6 con los valores separados por atributo.
+---
 
-Hecer el camino contrario también es fácil, o sea tenemos um objeto con dos dimensiones y 6 atributos y queremos colocar los atributos en una única dimensión, la función _merge()_ realiza la tarea.
+El objeto es del tipo "Large stars" con 2 dimensiones y 6 atributos de X1:X6, con los valores separados por atributo.
 
-Convertiendo atributos en una dimension
+Hacer el camino contrario también es fácil, o sea tenemos un objeto con dos dimensiones y 6 atributos y queremos colocar los atributos en una única dimensión, la función _merge()_ realiza la tarea.
 
-```{r}
+Convertiendo todos los atributos en una única dimension.
+
+---
+
+```{r 2_4}
 img2 <-merge(img.sep) 
+
 plot(img2, axes = T)
 ```
 
@@ -57,12 +72,15 @@ plot(img2, axes = T)
 
 Volvemos al formato del comienzo, pero en ese proceso se perdieron algunos nombres en la nueva dimension creada. Podemos restaurar los nombres iniciales o colocar nuevos como en el ejemplo siguiente
 
-```{r}
+```{r 2_5}
 img2 <- merge(img.sep) %>% 
-  setNames(names(img)) %>%
-  st_set_dimensions(3, values = paste0("banda ", 1:6)) %>%
-  st_set_dimensions(names = c("lon", "lat", "banda"))
+  setNames(names(img)) %>% 
+  st_set_dimensions(3,  # definiendo los nombres de las bandas en la dimensión 3
+                    values = paste0("banda ", 1:6)) %>%
+  st_set_dimensions(names = c("lon", "lat", "banda")) # nombres de las dimensiones
+
 img2
+
 plot(img2, axes = T)
 ```
 
@@ -72,8 +90,11 @@ plot(img2, axes = T)
 
 Cargamos en el ambiente el polígono del municipio de Olinda, usado en el documento anterior.
 
-```{r}
-olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp") # leitura
+---
+
+
+```{r 2_6}
+olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp") # lectura del archivo, el camino debe ser actualizado con los datos de la verdadera localización en su computador
 
 plot(olinda["gid"], axes = T)
 ```
@@ -82,56 +103,113 @@ plot(olinda["gid"], axes = T)
 
 El paso a paso para extrair valores de la imagen usando el polígono es:
 
-  1. Extrair el poligono del municipio de Olinda para usar en el corte de la imagen
-  
-  2. La imagen y el poligono de corte estan en sistemas de referencia diferentes, deben ser compatibilizados. 
-
-  3. Cortar la imagen, banda 1, con el poligono
-  
-  4. Visualizar la imagen cortada y el poligono
+  1. Verificar se ambos objetos están en el mismo sistema de referencia.
 
 ---
 
-```{r}
-olinda_mun <- st_as_sf(olinda[1], as_points = FALSE, merge = FALSE)
+```{r 2_7}
+st_crs(olinda)
 
-## EXPLICAR
-## 
-st_crs(olinda_mun)
 st_crs(img)
+```
 
-img <- st_transform(img, st_crs(olinda_mun))
+---
 
-img_corte1 <- img[olinda_mun][, , , 1:3]
+De los resultados verificamos que están en diferentes sistemas, siendo que a pesar de los dos estar en sistema UTM y en la misma zona 25S, los elipsoides no coinciden, a saber:
 
-plot(img_corte1[, , , 1], reset = FALSE, axes = T, main = " Municipio de Olinda -  Banda 1 (B)")
-plot(olinda_mun, col = NA, border = 'red', add = TRUE, lwd = 2)
+---
 
+|objeto   |	CRS       | Elipsoide                         |
+|:--------|:----------------------|:----------------------|
+| olinda  |WGS 84 / UTM zone 25S| ELLIPSOID["WGS 84",6378137,298.257223563|
+| img     |UTM Zone 25, Southern Hemisphere | ELLIPSOID["GRS80",6378137,298.257222101|   
+
+
+
+  2. La imagen y el poligono de corte estan en sistemas de referencia diferentes, deben ser compatibilizados. El procedimiento correcto es _transformar_ las coordenadas de un objeto en el sistema de referencia del otro. Escogemos compatibilizar al sistema WGS84, pero podria ser al contrario.  
+
+---
+
+```{r 2_8}
+img <- st_transform(img, st_crs(olinda))
+```
+
+---
+
+  3. Estando los dos objetos con el mismo sistema de referencia, vamos cortar la imagen en las bandas 1 a 3 (BGR), usando el poligono del municipio. El corte será hecho con el uso del paréntesis recto, como vimos en el documento 1 de esta serie.
+
+---
+
+```{r 2_9}
+img_corte1 <- img[olinda][, , , 1:3]
+```
+
+---
+  
+  4. Visualizar la imagen cortada en la primera banda y el poligono de corte
+
+---
+
+```{r 2_10 }
+plot(img_corte1[, , , 1], 
+     reset = FALSE, 
+     axes  = T, 
+     main  = " Municipio de Olinda -  Banda 1 (B)")
+
+plot(olinda, 
+     col    = NA, 
+     border = 'red', 
+     add    = TRUE, 
+     lwd    = 2)
+```
+
+---
+
+Y todas las bandas cortadas...
+
+---
+
+```{r 2_11}
 plot(img_corte1, axes = T)
-
 ```
 
 ---
 
-1. Creacion de un buffer de 2 km con centro en el el punto (291500, 9117500), definicion del sistema de referencia igual al de la imagen a cortar.
+Otra forma de cortar (clip) uma imagen, es creando dentro del propio ambiente _R_ un objeto vectorial de corte. Comenzaremos con el mas simple, que es un círculo creado alrededor de un punto determinado.
 
-2. Corte de la imagen con el circulo de 2 km
+  1. Creación de un buffer de 2 km con centro en el el punto (291500, 9117500), definición del sistema de referencia igual al de la imagen a cortar.
 
-3. Visualizacion
+  2. Corte de la imagen con el círculo de 2 km
 
+  3. Visualizacion
 
-```{r}
-# 1
-circulo = st_sfc(st_buffer(st_point(c(291500, 9117500)), 2000), crs = st_crs(img))
-# 2
+---
+
+```{r 2_12}
+# 1 Creación del círculo y definición del sistema de referencia
+circulo = st_sfc(st_buffer(st_point(c(291500, 9117500)), 2000), 
+                 crs = st_crs(img))
+# 2 corte 
 img_cir <- img[circulo][, , , 6]
-# 3
-plot(img_cir, axes = T, reset = FALSE, main = "Banda 6 con 2 km de buffer")
-plot(circulo, col = NA, border = 'red', add = TRUE, lwd = 2)
+
+# 3 visualización
+plot(img_cir, 
+     axes  = T, 
+     reset = FALSE, 
+     main  = "Banda 6 con 2 km de buffer",
+     ylim  = c(9115000, 9120000),
+     xlim  = c(288000, 294000))
+
+plot(circulo, 
+     col    = NA, 
+     border = 'red', 
+     add    = TRUE, 
+     lwd    = 2)
 ```
 
 ---
 
+También podemos usar un polígono, para simplificar usaremos un polígono cuadrado de 3 km.
 
 1. Creacion del poligono de 3 km x 3 km
 
@@ -139,19 +217,21 @@ plot(circulo, col = NA, border = 'red', add = TRUE, lwd = 2)
 
 3. Definir o sistema de referencia, igual al de la imagen a cortar y transformar el objeto tipo sfg (geometria) em sfc (lista de geometria).
 
-4. Visualizar
+4. Visualizar el polígono
 
 5. Cortar la imagen en las 3 bandas visibles, usando el poligono. Las bandas pueden determinarse específicamente también. 
 
 6. Visualizar
 
-```{r}
+---
+
+```{r 2_13}
 # 1
 pt1 = st_point(c(290000, 9119000))
 pt2 = st_point(c(293000, 9119000))
 pt3 = st_point(c(293000, 9116000))
 pt4 = st_point(c(290000, 9116000))
-pt5 = st_point(c(290000, 9119000))
+pt5 = st_point(c(290000, 9119000)) # punto de cierre, igual al pt1
 # 2
 pol <-st_polygon(list(rbind(pt1, pt2, pt3, pt4, pt5)))
 # 3
@@ -161,22 +241,70 @@ plot(pol, axes=T)
 # 5
 img_corte2 <- img[pol][, , , 1:3]
 # 6
-plot( img[pol][, , , 1:3], axes = T)
+plot( img[pol][, , , 1:3], 
+      axes = T,
+      xlim = c(289000, 294000),
+      ylim = c(9114000, 9120000))
 ```
 
 ---
 
-Extracción usando la función _crop()_ de la biblioteca **sf**. Fue colocado en el fragmento de código siguiente dos formas diferentes, usando el polígono ya definido anteriormente o estableciendo los límites del corte en forma explícita con un vector numérico.
+### Otras herramientas de extracción de datos
 
+Extracción usando la función _st_crop()_ de la biblioteca **sf**. Fue colocado en el fragmento de código siguiente dos formas diferentes, usando el polígono ya definido anteriormente o estableciendo los límites del corte en forma explícita con un vector numérico. Esta función solo puede ser usada con formas rectangulares.
 
-```{r}
+---
+
+```{r 2_14}
 p <- st_crop(img[, , , 1:3], pol)
 # el polígono también puede ser determinado con xmin, ymin, xmax, ymax de la forma:
 # p <- st_crop(img, c(290000, 9116000, 293000, 9119000))
-plot(p, axes = T)
+# 
+plot(p, axes = T,
+      xlim = c(289000, 294000),
+      ylim = c(9114000, 9120000))
 ```
 
 ---
 
+La función _cut_ corta la imagen, clasificando los valores en categorias, por exemplo, en el fragmento de código que sigue vamos a clasificar cada banda en tres categorias: valores de pixel entre 0 y 50, entre 50 y 100, y finalmente entre 100 y 255. Esta función pode ser útil en caso de querer extraer o eliminar valores determinados del atributo. 
 
+
+```{r 2_15}
+img_corte3 <- cut(img, c(0, 50, 100, 255))
+
+plot(img_corte3, axes =T )
+```
+
+---
+
+Otra función que puede ser útil es _dplyr::slice()_, que también permite extraer por ejemplo, bandas o valores determinados de cada dimensión.
+
+Primer ejemplo, extracción de las bandas 1 a 3.
+
+---
+
+```{r 2_16, message = F}
+library(dplyr)
+img_s1  <-   img %>% slice("band", 1:3)
+
+plot(img_s1, axes = T)
+```
+
+---
+
+Segundo ejemplo, extracción de las columnas 50 a 100, líneas 20 a 60 de las bandas 4 a 6 (infrarrojo).
+
+---
+
+```{r 2_17}
+img_s2 <- img        %>% 
+  slice("x", 50:100) %>% 
+  slice("y", 20:60)  %>% 
+  slice("band", 4:6)
+
+plot(img_s2, axes = T)
+```
+
+---
 
