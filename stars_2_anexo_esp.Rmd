@@ -1,0 +1,126 @@
+---
+title: "Stars 2"
+author: "Walter Humberto Subiza Pina"
+date: "12/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Manipulación de objetos stars raster y vectoriales
+
+### Otras herramientas de extracción de datos - ANEXO
+
+Con la imagen de los documentos anteriores , veremos otras formas de seleccionar y cortar datos específicos.
+
+
+```{r 2_1}
+library(stars)
+```
+
+---
+
+Cargar la imagen...
+
+---
+
+```{r 2_2}
+tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
+
+img = read_stars(tif) # lectura del archivo
+
+plot(img, axes = T) # visualizer las 6 bandas
+```
+
+---
+
+Polígono de corte...
+
+---
+
+```{r 2_13}
+# 1
+pt1 = st_point(c(290000, 9119000))
+pt2 = st_point(c(293000, 9119000))
+pt3 = st_point(c(293000, 9116000))
+pt4 = st_point(c(290000, 9116000))
+pt5 = st_point(c(290000, 9119000)) # punto de cierre, igual al pt1
+# 2
+pol <-st_polygon(list(rbind(pt1, pt2, pt3, pt4, pt5)))
+# 3
+pol <- st_sfc(pol, crs = st_crs(img))
+```
+
+---
+
+Extracción usando la función _sf::st_crop()_. Fue colocado en el fragmento de código siguiente el polígono ya definido anteriormente. Esta función solo puede ser usada con formas rectangulares.
+
+---
+
+```{r 2_14}
+p <- st_crop(img[, , , 1:3], pol)
+
+plot(p, axes = T,
+      xlim = c(289000, 294000),
+      ylim = c(9114000, 9120000))
+```
+
+---
+
+La función _stars::cut_ corta la imagen, clasificando los valores en categorias, por exemplo, en el fragmento de código que sigue vamos a clasificar cada banda en tres categorias: valores de pixel entre 0 y 50, entre 50 y 100, y finalmente entre 100 y 255. Esta función pode ser útil en caso de querer extraer o eliminar valores determinados del atributo. 
+
+---
+
+```{r 2_15}
+img_corte3 <- cut(img, c(0, 50, 100, 255))
+
+plot(img_corte3, axes =T )
+```
+
+---
+
+Al usar el paréntesis recto, podemos especificar capas e localizaciones específicas. Notese que vamos eliminar todos los valores de células inferiores a 50, establecer una nueva clasificación en una zona y capas específicas.
+
+---
+
+```{r}
+img_corte3 <- cut(img[1 ,45:180 , 100:250 , 1:3], c(50, 150, 200, 255))
+
+plot(img_corte3, axes =T )
+```
+
+
+---
+
+Otra función que puede ser útil es _dplyr::slice()_, que también permite extraer por ejemplo, bandas o valores determinados de cada dimensión.
+
+Primer ejemplo, extracción de las bandas 1 a 3.
+
+---
+
+```{r 2_16, message = F}
+library(dplyr)
+img_s1  <-   img %>% slice("band", 1:3)
+
+plot(img_s1, axes = T)
+```
+
+---
+
+Segundo ejemplo, extracción de las columnas 50 a 100, líneas 20 a 60 de las bandas 4 a 6 (infrarrojo).
+
+---
+
+```{r 2_17}
+img_s2 <- img        %>% 
+  slice("x", 50:100) %>% 
+  slice("y", 20:60)  %>% 
+  slice("band", 4:6)
+
+plot(img_s2, axes = T)
+```
+
+---
+
