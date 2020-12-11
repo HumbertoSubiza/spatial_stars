@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Apresentando "stars"
 
+### 1. Introdução
+
 Em 2018, o tratamento e manipulação de dados georreferenciados do tipo vetorial em _R_ foi revolucionado com o lançamento de **Pebesma E (2018) Simple features for R: standardized support for spatial vector data. R J 10(1):439–446** e a  biblioteca _**sf**_ que implementava os conceitos introduzidos. 
 
 De forma curta, pode-se dizer que a nova proposta, era que os dados espaciais vetoriales podem ser representados por um dataframe, no qual inclui-se uma nova coluna do tipo _lista_, a qual contem a geometria do objeto a representar. 
@@ -25,7 +27,7 @@ Porém, o conceito de ter uma biblioteca mais flexível e completa para o tratam
 
 Essa biblioteca introduze um outro conceito novo em _R_, o de _datacubes array_, que poderia ser traduzido como arranjo cúbico de dados (una sugestão) e onde a altura do cubo é dada por múltiplas dimensões.
 
-Assim sendo, o menor arquivo raster possui duas dimensões espaciais representando a localização por exemplo e um atributo, que é o tipo de dado da camada (layer). Na figura a seguir representa-se um arranjo cúbico de cinco dimensões.
+Assim sendo, o menor arquivo raster possui ao menos duas dimensões espaciais representando a localização por exemplo e um atributo, que é o tipo de dado da camada (layer). Na figura a seguir representa-se um arranjo cúbico de cinco dimensões.
 
 ![**Cinco dimensões: longitude, latitude, tempo, banda e sensor**](https://raw.githubusercontent.com/r-spatial/stars/master/images/cube2.png)
 
@@ -73,12 +75,14 @@ Vejamos alguns exemplos. Criamos um arranjo de 4 x 4 com três dimensões, a par
 ```{r}
 vector1 =  c (1, 2, 3,4) # primeiro vetor com 4 números
 vector2 =  c (5, 6, 7, 8, 9, 10, 11, 12) # segundo vetor com 8 números
-col.nomes <- c("col1","col2","col3","col4")
-lin.nomes <- c("lin1","lin2","lin3","lin4")
+col.nomes    <- c("col1","col2","col3","col4")
+lin.nomes    <- c("lin1","lin2","lin3","lin4")
 matriz.nomes <- c("M1","M2","M3")
-cubo = array (c(vector1, vector2), # criacão do arranjo
-              dim = c (4, 4, 3),# determinando o tamanho e dimensões
-              dimnames = list(lin.nomes, col.nomes, matriz.nomes))
+cubo <-  array (c(vector1, vector2), # criacão do arranjo
+                dim      = c(4, 4, 3),# determinando o tamanho e dimensões
+                dimnames = list(lin.nomes, 
+                                col.nomes, 
+                                matriz.nomes))
 
 cubo                                # visualização
 ```
@@ -121,7 +125,7 @@ plot(img, axes = T)
 
 ---
 
-### 3. Conhecendo o objeto
+### 4. Conhecendo o objeto
 
 Vejamos as características do objeto criado.
 
@@ -169,7 +173,7 @@ plot(img[1, 1:10, 20:30, 3:4], axes = T) # Extração e visualização
 
 ---
 
-### 4. Leitura do arquivo vetorial tipo ESRI pela biblioteca **sf**.
+### 5. Leitura do arquivo vetorial tipo ESRI pela biblioteca **sf**.
 
 Os objetos do tipo vetorial podem importar-se através da biblioteca **sf** ou podem ser criados usando funções da própria biblioteca **stars**. Primeiro vamos importar um arquivo da mesma área da imagen anterior, que representa os limites d município de Olinda, Pernambuco, Brasil. O mesmo foi obtido da página oficial do Instituto Brasileiro de Geografia e Estatística (IBGE) <https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/>.
 
@@ -206,21 +210,23 @@ plot(olinda_st[4:5])
 
 ---
 
-### 5. Salvar objetos **stars**
+### 6. Salvar objetos **stars**
 
 Para finalizar a apresentação, a função _write_stars()_ permite salvar objetos no disco duro, usando a biblioteca **GDAL**. O seguinte fragmento de código extrai e salva com o nome de "stars1.tif", as linhas 1 a 10, as colunas 20 a 30 das bandas 4 a 6 da imagem ETM, correspondentes às bandas de azul, verde e vermelho. Na sequência lê novamente o arquivo salvo e o visualiza num gráfico.
 
  
 ```{r}
 write_stars(adrop(img[1, 1:10, 20:30, 1:3]), "stars1.tif")
+# releitura
 tif <- c("stars1.tif")
 stars1 <- read_stars(tif)
+#
 plot(stars1, axes = T)
 ```
 
 ---
 
-### 6. Resumo e continuação
+### 7. Resumo e continuação
 
 Vimos nesta introdução o novo conceito de _arranjo cúbico de dados espaço-temporais_ dado pela biblioteca **stars**, leitura e análise dos objetos criados e como salvá-los. 
 
@@ -248,6 +254,6 @@ Subiza Pina, W.H., 2019 Introdução ao Análise Espacial, IBGE, Rio de Janeiro 
 
 ---
 
-Versão 1 de 2020-12-04 - Ano Covid-19
+Versão 1 de 2020-12-04 - Ano Covid
 
 ---

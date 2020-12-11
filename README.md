@@ -7,9 +7,35 @@ Repositorio para estudio y difusión de la biblioteca R "stars"
 
 Documentos relativos a la biblioteca pueden ser consultados em <https://r-spatial.github.io/stars/articles/>
 
-Primer documento con la presentación de la biblioteca **stars_1_esp.rmd** y **stars_1_prt.rmd**,  en idioma español y portugués fueron terminados en 4 de diciembre 2020.
+Primer documento _**Presentando "stars"**_ con la presentación de la biblioteca **stars_1_esp.rmd** y **stars_1_prt.rmd**,  en idioma español y portugués fueron terminados en 4 de diciembre 2020.
 
-Segundo documento en elaboración.
+  1. Introducción
 
+  2. Recordando arreglos (arrays)
+  
+  3. Lectura de datos
+  
+  4. Explorando el objeto
+  
+  5. Lectura de archivo vectorial tipo ESRI por la biblioteca **sf**
+  
+  6. Grabación de objetos **stars**
+  
+  7. Resumen y continuación
+
+Segundo documento _**Manipulación de objetos stars raster y vectoriales**_ en elaboración.
+
+Manipulación de objetos stars raster y vectoriales
+
+  1. Leyendo  el raster
+  
+  2. Conversión de dimensión en atributos y atributos en dimensión
+  
+  3. Extracción de valores usando objetos vectoriales
+  
+  4. Otras herramientas de extracción de datos
+  
+
+Otras herramientas de extracción de datos - ANEXO
 
 
