@@ -125,6 +125,35 @@ plot(img_s2, axes = T)
 
 ---
 
+### Ejercicio de aplicación: Calculo del índice NVDI
+
+El Índice de Vegetación por Diferencia Normalizada (NVDI), es una aplicación de imagenes de sensores remotos muy usada en estudios del paisaje terrestre, permite comprender la situación de la cobertura vegetal, analizar la situación de terrreno actual o pasada, biomasa entre otras. 
+
+Este índice es obtenido a partir de la combinación de la bandas 3 y 4 (rojo e infrarrojo cercano) en imagenes del satélite Landsat ETM7.
+
+$$NVDI = {{NIR - RED} \over {NIR + RED}}$$
+
+Vamos calcular el índice usando las bandas sin corrección, o sea con los niveles digitales y sin corrección de reflectancia con el fin de simplificar el proceso.
+
+Después del calculo, vamos inspeccionar el objeto, crear una escala de colores entre el azul y el verde y finalmente visualizar el índice.
+
+---
+
+```{r}
+nvdi = (img[ , , , 4] - img[, , , 3])/
+       (img[ , , , 4] + img[, , , 3])
+
+nvdi # inspección del objeto creado
+
+cols <- RColorBrewer::brewer.pal(8, "BuGn") # escala de colores
+
+# visualización
+plot(nvdi, 
+     axes = T,
+     col  = cols,
+     main = "Índice NVDI")
+```
+
 
 ---
 
