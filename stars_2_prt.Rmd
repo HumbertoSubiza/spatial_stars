@@ -9,55 +9,55 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Manipulación de objetos stars raster y vectoriales
+### Manipulação de objetos stars raster e vetoriales
 
-Comenzamos cargando nuevamente la imagen de ejemplo de la biblioteca **stars**. El archivo es una imagen Landsat 7 ETM formato Geotiff, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo cercano.
+Começamos carregando novamente a imagem de exemplo da biblioteca **stars**. O arquivo é uma imagem Landsat 7 ETM formato Geotiff, com 6 bandas, azul, verde, vermelho (BGR) e 3 mais de infravermelho próximo.
 
 ```{r 2_1}
 library(stars)
 ```
 
-### 1. Leyendo  el raster
+### 1. Lendo  o raster
 
 ---
 
 ```{r 2_2}
-tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
+tif = system.file("tif/L7_ETMs.tif", package = "stars")# creação do caminho do arquivo como objeto texto
 
-img = read_stars(tif) # lectura del archivo
+img = read_stars(tif) # leitura do arquivo
 
-plot(img, axes = T) # visualizar las 6 bandas
+plot(img, axes = T) # visualição das 6 bandas
 ```
 
 ---
 
-Es un objeto de 3 dimensiones, _x_, _y_, _band_ en formato de lista. Si inspeccionamos el objeto _img_ en la ventana de ambiente de _RStudio_, vemos un vector numérico con el tamaño de cada dimensión [1:349, 1:352, 1:6] y los valores a continuación. 
+É um objeto de 3 dimensões, _x_, _y_, _band_ em formato de lista. Se olhamos o objeto _img_ na janela de ambiente do _RStudio_, vemos um vetor numérico com o tamanho de cada dimensão [1:349, 1:352, 1:6] e os valores na sequencia. 
 
 ---
 
-### 2. Conversión de dimensión en atributos y atributos en dimensión
+### 2. Conversão de dimensão em atributos e atributos em dimensão
 
-El objeto leído tiene en su tercera dimensión _band_ una lista con las bandas 1 a 6. Es posible pasar las bandas para atributos y eliminar la dimensión correspondiente. 
+O objeto lido tem na sua terceira dimensão _band_ uma lista com as bandas 1 a 6. É possível passar as bandas para atributos e eliminar a dimensão correspondente. 
 
-De esta forma el nuevo objeto que crearemos tendrá solamente las dimensiones espaciales de _x_ e _y_ y 6 nuevos atributos. La función que será usada es _split()_, que divide los datos indicados en el primer argumento, de acuerdo a grupos definidos por el segundo argumento colocado. 
+Desta forma, o novo objeto que será criado terá somente as dimensões espaciales de _x_ e _y_ e 6 novos atributos. A função que será usada é _split()_, que divide os dados indicados no primeiro argumento, em grupos definidos pelo segundo argumento colocado. 
 
 ---
 
 ```{r 2_3}
-# separación de la imagen por la dimensión bandas
+# separação da imagem pela dimensão bandas
 (img.sep = split(img, "band"))
 
-# visualización del atributo X4, anterior banda 4
+# visualização do atributo X4, anterior banda 4
 plot(img.sep["X4"], axes = T)
 ```
 
 ---
 
-El objeto es del tipo "Large stars" con 2 dimensiones y 6 atributos de X1:X6, con los valores separados por atributo.
+O objeto é da classe "Large stars" com 2 dimensões e 6 atributos de X1:X6, os valores encontram-se separados por atributo.
 
-Hacer el camino contrario también es fácil, o sea tenemos un objeto con dos dimensiones y 6 atributos y queremos colocar los atributos en una única dimensión, la función _merge()_ realiza la tarea.
+Fazer o caminho contrário também é simples, o seja temos um objeto com duas dimensões e 6 atributos e vamos colocar os atributos numa única dimensão, a função _merge()_ realiza a tarefa.
 
-Convertiendo todos los atributos en una única dimension.
+Convertendo todos os atributos num única dimensão.
 
 ---
 
@@ -69,14 +69,14 @@ plot(img2, axes = T)
 
 ---
 
-Volvemos al formato del comienzo, pero en ese proceso se perdieron algunos nombres en la nueva dimension creada. Podemos restaurar los nombres iniciales o colocar nuevos como en el ejemplo siguiente
+Voltamos ao formato inicial, mas nesse processo perderom-se alguns nomes na nova dimensão criada. Podemos restaurar os nomes iniciais ou colocar novos como no exemplo siguiente.
 
 ```{r 2_5}
 img2 <- merge(img.sep)       %>% 
         setNames(names(img)) %>% 
-        st_set_dimensions(3,        # definiendo los nombres de las bandas en la dimensión 3
+        st_set_dimensions(3,        # definindo os nomes das bandas na dimensão 3
                           values = paste0("banda ", 1:6)) %>%
-                          st_set_dimensions(names = c("lon", "lat", "banda")) # nombres de las dimensiones
+                          st_set_dimensions(names = c("lon", "lat", "banda")) # nomes das dimensões
 
 img2
 
@@ -85,24 +85,24 @@ plot(img2, axes = T)
 
 ---
 
-### 3. Extracción de valores usando objetos vectoriales
+### 3. Extração de valores usando objetos vectoriales
 
-Cargamos en el ambiente el polígono del municipio de Olinda, Brasil, usado en el documento anterior.
+Carregamos no ambiente o polígono do município de Olinda, Brasil, usado no documento anterior.
 
 ---
 
 
 ```{r 2_6}
-olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp") # lectura del archivo, el camino debe ser actualizado con los datos de la verdadera localización en su computador
+olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp") # leitura do arquivo, o caminho debe ser atualizado com os dados da real localização no seu computador
 
 plot(olinda["gid"], axes = T)
 ```
 
 ---
 
-El paso a paso para extrair valores de la imagen usando el polígono es:
+O passo a passo para extrair valores da imagem usando o polígono é:
 
-  1. Verificar se ambos objetos están en el mismo sistema de referencia.
+  1. Verificar se ambos os objetos estão no mesmo sistema de referencia.
 
 ---
 
@@ -114,19 +114,19 @@ st_crs(img)
 
 ---
 
-De los resultados verificamos que están en diferentes sistemas, siendo que a pesar de los dos estar en sistema UTM y en la misma zona 25S, los elipsoides no coinciden, a saber:
+Dos resultados verificamos que estão em diferentes sistemas, sendo que apesar dos dois estarem em sistema UTM e na mesma zona 25S, os elipsóides no coincidem, ou seja:
 
 ---
 
-|objeto   |	CRS       | Elipsoide                         |
+|objeto   |	CRS       | Elipsóide                         |
 |:--------|:----------------------|:----------------------|
 | olinda  |WGS 84 / UTM zone 25S| ELLIPSOID["WGS 84",6378137,298.257223563|
 | img     |UTM Zone 25, Southern Hemisphere | ELLIPSOID["GRS80",6378137,298.257222101|   
 
 
 
-  2. La imagen y el poligono de corte estan en sistemas de referencia diferentes, deben ser compatibilizados. El procedimiento correcto es _transformar_ las coordenadas de un objeto en el sistema de referencia del otro. Escogemos compatibilizar al sistema WGS84, pero podria ser al contrario.  
-
+  2. A imagem e o polígono de corte estam em sistemas de referencia diferentes, debem ser compatibilizados. O correto procedimento  é _transformar_ as coordenadas de um objeto no sistema de referencia do outro. Escolhemos compatibilizar ao sistema WGS84, mas podria ser o inverso.  
+e
 ---
 
 ```{r 2_8}
@@ -135,7 +135,7 @@ img <- st_transform(img, st_crs(olinda))
 
 ---
 
-  3. Estando los dos objetos con el mismo sistema de referencia, vamos cortar la imagen en las bandas 1 a 3 (BGR), usando el poligono del municipio. El corte será hecho con el uso del paréntesis recto, como vimos en el documento 1 de esta serie.
+  3. Com os dois objetos no mesmo sistema de referencia, será cortada a imagem nas bandas 1 a 3 (BGR), usando o polígono do municipio. O corte será feito usando  paréntesis reto, como vimos no documento 1 desta série.
 
 ---
 
@@ -277,7 +277,7 @@ plot(img_corte3, axes =T )
 
 ---
 
-Otra función que puede ser útil es _dplyr::slice()_, que también permite extraer por ejemplo, bandas o valores determinados de cada dimensión.
+Otra función que puede ser útil es _dplyr::slice()_, que también permite extraer por ejemplo, bandas o valores determinados de cada dimensão.
 
 Primer ejemplo, extracción de las bandas 1 a 3.
 
