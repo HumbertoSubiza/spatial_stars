@@ -135,7 +135,9 @@ img <- st_transform(img, st_crs(olinda))
 
 ---
 
-  3. Com os dois objetos no mesmo sistema de referencia, será cortada a imagem nas bandas 1 a 3 (BGR), usando o polígono do municipio. O corte será feito usando  paréntesis reto, como vimos no documento 1 desta série.
+  3. Com os dois objetos no mesmo sistema de referencia, será cortada a imagem nas bandas 1 a 3 (BGR), usando o polígono do municipio. 
+  
+  O corte será feito usando  paréntesis reto, como vimos no documento 1 desta série.
 
 ---
 
@@ -145,7 +147,7 @@ img_corte1 <- img[olinda][, , , 1:3]
 
 ---
   
-Visualizar la imagen cortada en la primera banda y el poligono de corte.
+Visualizar a imagem cortada na primera banda e o polígono de corte.
 
 ---
 
@@ -164,7 +166,7 @@ plot(olinda,
 
 ---
 
-Y todas las bandas cortadas...
+E todas as bandas cortadas...
 
 ---
 
@@ -174,28 +176,28 @@ plot(img_corte1, axes = T)
 
 ---
 
-Otra forma de cortar (clip) uma imagen, es creando dentro del propio ambiente _R_ un objeto vectorial de corte. Comenzaremos con el mas simple, que es un círculo creado alrededor de un punto determinado.
+Outra forma de cortar (clip) uma imagen, é criando dentro do próprio ambiente _R_ um objeto vetorial de corte. Começamos com o objeto mais simples, que é um círculo criado entorno dum ponto determinado.
 
-  1. Creación de un buffer de 2 km con centro en el el punto (291500, 9117500), definición del sistema de referencia igual al de la imagen a cortar.
+  1. Creação de um buffer de 2 km com centro no ponto (291500, 9117500), definição do sistema de referencia igual ao sistema da imagen a cortar.
 
-  2. Corte de la imagen con el círculo de 2 km
+  2. Corte da imagem com o círculo de 2 km
 
-  3. Visualizacion
+  3. Visualização
 
 ---
 
 ```{r 2_12}
-# 1 Creación del círculo y definición del sistema de referencia
+# 1 Criação do círculo e definição do sistema de referencia
 circulo = st_sfc(st_buffer( st_point(c(291500, 9117500)), 2000), 
                  crs = st_crs(img))
 # 2 corte 
 img_cir <- img[circulo][, , , 6]
 
-# 3 visualización
+# 3 visualização
 plot(img_cir, 
      axes  = T, 
      reset = FALSE, 
-     main  = "Banda 6 con 2 km de buffer",
+     main  = "Banda 6 com 2 km de buffer",
      ylim  = c(9115000, 9120000),
      xlim  = c(288000, 294000))
 
@@ -208,17 +210,17 @@ plot(circulo,
 
 ---
 
-También podemos usar un polígono, para simplificar usaremos un polígono cuadrado de 3 km.
+Também podemos usar um objeto polígono, para simplificar faremos um polígono quadrado de 3 km de lado.
 
-1. Creacion del poligono de 3 km x 3 km
+1. Criação do polígono de 3 km x 3 km
 
-2. Transformar la geometria en poligono
+2. Transformar a geometria em polígono
 
-3. Definir o sistema de referencia, igual al de la imagen a cortar y transformar el objeto tipo sfg (geometria) em sfc (lista de geometria).
+3. Definir o sistema de referencia, igual ao da imagem a cortar e transformar o objeto tipo sfg (geometria) em sfc (lista de geometria).
 
-4. Visualizar el polígono
+4. Visualizar o polígono
 
-5. Cortar la imagen en las 3 bandas visibles, usando el poligono. Las bandas pueden determinarse específicamente también. 
+5. Cortar a imagem nas 3 bandas visíveis, usando o polígono. As bandas podem determinar-se específicamente também. 
 
 6. Visualizar
 

@@ -174,9 +174,9 @@ plot(img_corte1, axes = T)
 
 ---
 
-Otra forma de cortar (clip) uma imagen, es creando dentro del propio ambiente _R_ un objeto vectorial de corte. Comenzaremos con el mas simple, que es un círculo creado alrededor de un punto determinado.
+Otra forma de cortar (clip) una imagen, es creando dentro del propio ambiente _R_ un objeto vectorial de corte. Comenzaremos con el mas simple, que es un círculo creado alrededor de un punto determinado.
 
-  1. Creación de un buffer de 2 km con centro en el el punto (291500, 9117500), definición del sistema de referencia igual al de la imagen a cortar.
+  1. Creación de un buffer de 2 km con centro en el punto (291500, 9117500), definición del sistema de referencia igual al de la imagen a cortar.
 
   2. Corte de la imagen con el círculo de 2 km
 
@@ -208,13 +208,13 @@ plot(circulo,
 
 ---
 
-También podemos usar un polígono, para simplificar usaremos un polígono cuadrado de 3 km.
+También podemos usar un polígono, para simplificar usaremos un objeto polígono cuadrado de 3 km de lado.
 
 1. Creacion del poligono de 3 km x 3 km
 
 2. Transformar la geometria en poligono
 
-3. Definir o sistema de referencia, igual al de la imagen a cortar y transformar el objeto tipo sfg (geometria) em sfc (lista de geometria).
+3. Definir el sistema de referencia, igual al de la imagen a cortar y transformar el objeto tipo sfg (geometria) en sfc (lista de geometria).
 
 4. Visualizar el polígono
 
