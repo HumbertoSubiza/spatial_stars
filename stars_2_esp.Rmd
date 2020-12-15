@@ -266,7 +266,7 @@ plot(p, axes = T,
 
 ---
 
-La función _cut_ corta la imagen, clasificando los valores en categorias, por exemplo, en el fragmento de código que sigue vamos a clasificar cada banda en tres categorias: valores de pixel entre 0 y 50, entre 50 y 100, y finalmente entre 100 y 255. Esta función pode ser útil en caso de querer extraer o eliminar valores determinados del atributo. 
+La función _cut_ corta la imagen, clasificando los valores en categorias, por ejemplo, en el fragmento de código que sigue vamos a clasificar cada banda en tres categorias: valores de pixel entre 0 y 50, entre 50 y 100, y finalmente entre 100 y 255. Esta función pode ser útil en caso de querer extraer o eliminar valores determinados del atributo. 
 
 
 ```{r 2_15}
@@ -283,9 +283,8 @@ Primer ejemplo, extracción de las bandas 1 a 3.
 
 ---
 
-```{r 2_16, message = F}
-library(dplyr)
-img_s1  <-   img %>% slice("band", 1:3)
+```{r 2_16}
+img_s1  <-   img %>%  dplyr::slice("band", 1:3)
 
 plot(img_s1, axes = T)
 ```
@@ -298,16 +297,16 @@ Segundo ejemplo, extracción de las columnas 50 a 100, líneas 20 a 60 de las ba
 
 ```{r 2_17}
 img_s2 <- img        %>% 
-  slice("x", 50:100) %>% 
-  slice("y", 20:60)  %>% 
-  slice("band", 4:6)
+   dplyr::slice("x", 50:100) %>% 
+   dplyr::slice("y", 20:60)  %>% 
+   dplyr::slice("band", 4:6)
 
 plot(img_s2, axes = T)
 ```
 
 ---
 
-### Referências
+### Referencias
 
   **STARS**
 
