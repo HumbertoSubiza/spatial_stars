@@ -1,6 +1,6 @@
 ---
 title: "Stars 2"
-author: "Walter Humberto Subiza Pina"
+author: "Walter Humberto Subiza Piña"
 date: "12/5/2020"
 output: html_document
 ---
