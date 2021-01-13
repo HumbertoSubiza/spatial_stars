@@ -1,0 +1,91 @@
+---
+title: "Otros formatos"
+author: "Walter Humberto Subiza Pina"
+date: "12/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Otros formatos, lectura y ejemplos
+
+## TRABAJANDO EN EL DOCUMENTO
+
+```{r}
+library(stars)
+
+```
+
+Lectura de arquivo tipo netCDF, con temperaturas en grados Kelvin de la superficie de los oceanos.
+
+https://www.unidata.ucar.edu/software/netcdf/examples/files.html
+
+```{r}
+tos <- c("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/tos_O1_2001-2002.nc") %>%
+  read_ncdf(tos)
+tos
+```
+
+---
+
+| Dim|from  | to      |offset |  delta| refsys| point| values    | 
+|:---|:-----|:--------|:------|:------|:------|:-----|:----------|   
+|lon |1     |180      |  0    |   2   | WGS 84|   NA |  NULL [x] |
+|lat |1     | 170     | -80   |   1   | WGS 84|   NA |  NULL [y] |
+|time|1     | 24      | 2001-01-01 30 days  | PCICt |   NA |  NULL    |  
+
+Vemos................... continuar
+
+Relación entre la escala absoluta Kelvin y grados Celsius: $$ C = K - 273.15$$
+Transformación de escala y agregado de nuevo atributo. Se crea una constante en grados Kelvin para compatibilidad en la operación. 
+
+```{r}
+# constante
+const <- units::set_units(273.15, K)
+
+# transformar los valores de temperatura y guardar como otro atributo denominado tos_C
+tos$tos_C <- (tos[[1]] - const)
+tos
+```
+
+
+Visualizacion
+
+escala de colores
+
+```{r}
+cols <- RColorBrewer::brewer.pal(7, "Blues") # escala de cores
+
+# visualizacion
+# #plot(tos$tos_C, 
+plot(tos["tos_C"],
+     axes = T,
+     col  = cols)
+```
+
+
+
+
+
+```{r}
+# criar sequencia
+inter <- seq(from = 1, to = 12, by =3)
+
+plot(tos[2, , , inter],
+     axes = T,
+     col  = cols)
+```
+
+Costa brasilena
+
+```{r}
+plot(tos[2, 155:164 ,42:83 , inter],
+     axes = T,
+     col  = cols)
+```
+
+
+
+
