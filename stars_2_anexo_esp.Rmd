@@ -55,7 +55,7 @@ pol <- st_sfc(pol, crs = st_crs(img))
 
 ---
 
-Extracción usando la función _sf::st_crop()_. Fue colocado en el fragmento de código siguiente el polígono ya definido anteriormente. Esta función solo puede ser usada con formas rectangulares.
+Extracción usando la función _sf::st_crop()_. Fue colocado en el fragmento de código siguiente el polígono ya definido anteriormente. Esta función solo puede ser usada con formas cuadrangulares.
 
 ---
 

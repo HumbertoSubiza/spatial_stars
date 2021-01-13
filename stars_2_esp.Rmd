@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Manipulación de objetos stars raster y vectoriales
+### Manipulación de objetos **stars**, raster y vectoriales
 
 Comenzamos cargando nuevamente la imagen de ejemplo de la biblioteca **stars**. El archivo es una imagen Landsat 7 ETM formato Geotiff, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo cercano.
 
@@ -27,6 +27,8 @@ tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del
 img = read_stars(tif) # lectura del archivo
 
 plot(img, axes = T) # visualizar las 6 bandas
+
+img
 ```
 
 ---
@@ -37,7 +39,7 @@ Es un objeto de 3 dimensiones, _x_, _y_, _band_ en formato de lista. Si inspecci
 
 ### 2. Conversión de dimensión en atributos y atributos en dimensión
 
-El objeto leído tiene en su tercera dimensión _band_ una lista con las bandas 1 a 6. Es posible pasar las bandas para atributos y eliminar la dimensión correspondiente. 
+El objeto leído tiene en su tercera dimensión _band_, una lista con las bandas 1 a 6. Es posible pasar las bandas para atributos y eliminar la dimensión correspondiente. 
 
 De esta forma el nuevo objeto que crearemos tendrá solamente las dimensiones espaciales de _x_ e _y_ y 6 nuevos atributos. La función que será usada es _split()_, que divide los datos indicados en el primer argumento, de acuerdo a grupos definidos por el segundo argumento colocado. 
 

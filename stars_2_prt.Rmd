@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Manipulação de objetos stars raster e vetoriales
+### Manipulação de objetos **stars**, raster e vetoriales
 
 Começamos carregando novamente a imagem de exemplo da biblioteca **stars**. O arquivo é uma imagem Landsat 7 ETM formato Geotiff, com 6 bandas, azul, verde, vermelho (BGR) e 3 mais de infravermelho próximo.
 
@@ -27,6 +27,8 @@ tif = system.file("tif/L7_ETMs.tif", package = "stars")# creação do caminho do
 img = read_stars(tif) # leitura do arquivo
 
 plot(img, axes = T) # visualição das 6 bandas
+
+img
 ```
 
 ---
@@ -37,7 +39,7 @@ plot(img, axes = T) # visualição das 6 bandas
 
 ### 2. Conversão de dimensão em atributos e atributos em dimensão
 
-O objeto lido tem na sua terceira dimensão _band_ uma lista com as bandas 1 a 6. É possível passar as bandas para atributos e eliminar a dimensão correspondente. 
+O objeto lido tem na sua terceira dimensão _band_, uma lista com as bandas 1 a 6. É possível passar as bandas para atributos e eliminar a dimensão correspondente. 
 
 Desta forma, o novo objeto que será criado terá somente as dimensões espaciales de _x_ e _y_ e 6 novos atributos. A função que será usada é _split()_, que divide os dados indicados no primeiro argumento, em grupos definidos pelo segundo argumento colocado. 
 
@@ -125,8 +127,8 @@ Dos resultados verificamos que estão em diferentes sistemas, sendo que apesar d
 
 
 
-  2. A imagem e o polígono de corte estam em sistemas de referencia diferentes, debem ser compatibilizados. O correto procedimento  é _transformar_ as coordenadas de um objeto no sistema de referencia do outro. Escolhemos compatibilizar ao sistema WGS84, mas podria ser o inverso.  
-e
+  2. A imagem e o polígono de corte estam em sistemas de referencia diferentes, debem ser compatibilizados. O correto procedimento  é _transformar_ as coordenadas de um objeto no sistema de referencia do outro. Escolhemos compatibilizar ao sistema WGS84, mas podria ser o caminho contrário.  
+
 ---
 
 ```{r 2_8}
@@ -216,7 +218,7 @@ Também podemos usar um objeto polígono, para simplificar faremos um polígono 
 
 2. Transformar a geometria em polígono
 
-3. Definir o sistema de referencia, igual ao da imagem a cortar e transformar o objeto tipo sfg (geometria) em sfc (lista de geometria).
+3. Definir o sistema de referencia, igual ao da imagem a cortar e transformar o objeto tipo _sfg_ (geometria) em _sfc_ (lista de geometria).
 
 4. Visualizar o polígono
 
@@ -232,7 +234,7 @@ pt1 = st_point(c(290000, 9119000))
 pt2 = st_point(c(293000, 9119000))
 pt3 = st_point(c(293000, 9116000))
 pt4 = st_point(c(290000, 9116000))
-pt5 = st_point(c(290000, 9119000)) # ponto de fechamenot, idéntico ao pt1
+pt5 = st_point(c(290000, 9119000)) # ponto de fechamento, idéntico ao pt1
 # 2
 pol <-st_polygon(list(rbind(pt1, pt2, pt3, pt4, pt5)))
 # 3

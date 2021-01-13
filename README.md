@@ -1,8 +1,14 @@
 # spatial_stars
+
+---
+
 Repo for study the R stars package and related spatial data analysis, in spanish and portuguese languages
+
 Begin 20201116.
 
-Repositorio para estudio y difusión de la biblioteca R "stars"
+---
+
+Repositorio para estudio y difusión de la biblioteca _R_ "stars"
 <https://cran.r-project.org/web/packages/stars/index.html> Edzer Pebesma e otros.
 
 Documentos relativos a la biblioteca pueden ser consultados em <https://r-spatial.github.io/stars/articles/>
@@ -23,7 +29,7 @@ Primer documento _**Presentando "stars"**_ con la presentación de la biblioteca
   
   7. Resumen y continuación
 
-Segundo documento _**Manipulación de objetos stars raster y vectoriales**_ en elaboración.
+Segundo documento _**Manipulación de objetos stars raster y vectoriales**_ terminado 2021-01-13.
 
 Manipulación de objetos stars raster y vectoriales
 
@@ -36,6 +42,14 @@ Manipulación de objetos stars raster y vectoriales
   4. Otras herramientas de extracción de datos
   
 
-Otras herramientas de extracción de datos - ANEXO
+Tercer documentno _**Manipulación de objetos stars, raster y vectoriales - ANEXO**_
+
+  1. Otras herramientas de extracción de datos 
+  
+  2. Ejercicio de aplicación: Calculo del índice NVDI
+  
+  Terminado 2021-01-13.
+  
+
 
 

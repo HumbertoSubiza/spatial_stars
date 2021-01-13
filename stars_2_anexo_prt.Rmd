@@ -55,7 +55,7 @@ pol <- st_sfc(pol, crs = st_crs(img))
 
 ---
 
-Extração usando a função _sf::st_crop()_. Foi colocado no código seguinte o polígono já definido anteriormente. Esta função pode ser usada apenas com formas rectangulares.
+Extração usando a função _sf::st_crop()_. Foi colocado no código seguinte o polígono já definido anteriormente. Esta função pode ser usada apenas com formas quadrangulares.
 
 ---
 
@@ -135,7 +135,7 @@ $$NVDI = {{NIR - RED} \over {NIR + RED}}$$
 
 Vamos calcular o índice usando as bandas sem correção, ou seja com os níveis digitais e sem correção de refletancia a fim de tornar o proceso mais simples.
 
-Uma vez feito o cálculo, inspecionamos o objeto, criamoa uma escala de cores entre  azul e verde e finalmente graficamos o índice.
+Uma vez feito o cálculo, inspecionamos o objeto, criamos uma escala de cores entre  azul e verde e finalmente graficamos o índice.
 
 ---
 
