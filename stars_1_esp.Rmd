@@ -43,9 +43,9 @@ Cuando la biblioteca _**stars**_ es cargada en el ambiente _R_, trae consigo 2 b
   
   3. GEOS- _rgeos_, manipulación de la geometria de los elementos georreferenciados;
   
-  4. GDAL- _rgadal_, para transformación de formatos vectoriales y raster;
+  4. GDAL- _rgdal_, para transformación de formatos vectoriales y raster;
   
-  5. PROJ- _proj4_, interfase para transformación de sistemas de coordenadas geográficas en sistema de coordenadas proyectadas.
+  5. PROJ- _proj4_, interfase para transformación de sistemas de coordenadas geográficas en sistema de coordenadas proyectadas y viceversa.
 
 
 ```{r}
@@ -114,7 +114,7 @@ Un archivo raster puede ser leído de un directorio externo al ambiente usando l
  
 La biblioteca permite trabajar con dados en mallas regular o irregulamente espaciadas, así como con proyecciones cartesianas o curvilíneas. Durante la lectura e importación del archivo (o parte de él), los valores de las bandas importadas muchas vezes UINT8 o UINT16, son convertidos a valores numéricos de doble precisión y si necesario, reconvertidos. Todos los datos importados en la lectura se almacenan en una única estructura de arreglo **stars**.
 
-Para simplificar vamos leer un archivo raster de ejemplo que la propia biblioteca **stars** incluye. El archivo es una imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo, emn formato Geotiff. La importación hará uso de la biblioteca GDAL.
+Para simplificar vamos leer un archivo raster de ejemplo que la propia biblioteca **stars** incluye. El archivo es una imagem Landsat 7 ETM, con 6 bandas, azul, verde, rojo (BGR) y 3 más de infrarrojo, en formato Geotiff. La importación hará uso de la biblioteca GDAL.
 
 ```{r}
 tif = system.file("tif/L7_ETMs.tif", package = "stars")# creacion del camino del archivo como objeto texto
@@ -143,11 +143,11 @@ Por último muestra los componentes de cada dimensión, siendo:
 |:--------|:----------------------|
 |from    | origen del indice (i = 1)  |
 |to	     |indice final (dim(x)[i])|
-|offset  |valor inicial del pixel (si objeto regular)|
-|delta	 |tamaño del intervalo de pixel o célula, (si objeto regular)|
+|offset  |valor inicial del pixel (si es objeto regular)|
+|delta	 |tamaño del intervalo de pixel o célula, (si es objeto regular)|
 |refsys	 |sistema geodésico de referencia en formato proj4|
 |point	 |valor lógico; las células son puntos (T) o intervalos (F)|
-|values	 |secuencia de valores (ex. geometries),se irregular|
+|values	 |secuencia de valores (ex. geometries), se irregular|
 
 En el caso específico de la imagen importada la cantidad de células en  la dimension _x_ es de 349 y en la dimensión _y_ de 352, comenzando con los valores de 288776 para el eje _x_ y de 9120761 para _y_. El sistema de referencia es UTM zona 25S y los intervalos entre cada célula (delta) de 28,5 m y -28,5 m respectivamente. La imagen corresponde a un raster (point = F) del área de Recife, Brasil.
 
@@ -173,7 +173,7 @@ plot(img[1, 1:10, 20:30, 3:4], axes = T) # Extracción y visualización
 
 ### 5. Lectura de archivo vectorial tipo ESRI por la biblioteca **sf**
 
-Los objetos del tipo vectorial pueden importarse a través de la biblioteca **sf** o pueden crearse usando funciones de la propia biblioteca **stars**. Primero vamos importar un archivo de la misma área de la imagen anterior, que representa los límites del municipio de Olinda, Pernambuco, Brasil. El mismo fue obtenido de la página oficial del Instituto Brasileiro de Geografia e Estatística (IBGE) <https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/>.
+Los objetos del tipo vectorial pueden importarse a través de la biblioteca **sf** (por mas detalles sobre la biblioteca, vea <https://humbertosubiza.github.io/Intro_analise_espacial_R/>) o pueden crearse usando funciones de la propia biblioteca **stars**. Primero vamos importar un archivo de la misma área de la imagen anterior, que representa los límites del municipio de Olinda, Pernambuco, Brasil. El mismo fue obtenido de la página oficial del Instituto Brasileiro de Geografia e Estatística (IBGE) <https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/>.
 
 ```{r}
 olinda <- read_sf("C:/Users/Walter Pina/Documents/Github/spatial_stars/datos/olinda.shp") # lectura
@@ -214,9 +214,9 @@ Para finalizar esta presentación, la función _write_stars()_ permite grabar ob
 
  
 ```{r}
-write_stars(adrop(img[1, 1:10, 20:30, 1:3]), "stars1.tif")
+write_stars(adrop(img[1, 1:10, 20:30, 1:3]), "datos/stars1.tif")
 # Relectura
-tif <- c("stars1.tif")
+tif <- c("datos/stars1.tif")
 stars1 <- read_stars(tif)
 #
 plot(stars1, axes = T)
@@ -243,6 +243,11 @@ stars: Spatiotemporal Arrays, Raster and Vector Data Cubes en:
 ---
 
 Pebesma, E., 2018. Simple Features for R: Standardized Support for Spatial Vector Data. The R Journal 10 (1), 439-446, https://doi.org/10.32614/RJ-2018-009 <https://r-spatial.github.io/sf/>
+
+---
+
+Subiza Pina, W.H., 2019 Introdução ao Análise Espacial, IBGE, Rio de Janeiro em <https://github.com/HumbertoSubiza/Intro_analise_espacial_R>
+
 
 ---
 
