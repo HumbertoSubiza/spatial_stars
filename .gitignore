@@ -4,7 +4,7 @@
 .Ruserdat
 teste.tif
 teste.tif.aux.xml
-.html
+*.html
 docs
 stars1.tif
 stars_2_anexo_prt.html
